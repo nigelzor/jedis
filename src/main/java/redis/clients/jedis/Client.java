@@ -2,17 +2,10 @@ package redis.clients.jedis;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Client extends Connection {
     public enum LIST_POSITION {
         BEFORE, AFTER
-    }
-
-    private boolean isInMulti;
-
-    public boolean isInMulti() {
-        return isInMulti;
     }
 
     public Client(String host) {
@@ -111,10 +104,6 @@ public class Client extends Connection {
         sendCommand("SETNX", key, value);
     }
 
-    public void setex(String key, int seconds, String value) {
-        sendCommand("SETEX", key, String.valueOf(seconds), value);
-    }
-
     public void mset(String... keysvalues) {
         sendCommand("MSET", keysvalues);
     }
@@ -137,72 +126,6 @@ public class Client extends Connection {
 
     public void incr(String key) {
         sendCommand("INCR", key);
-    }
-
-    public void append(String key, String value) {
-        sendCommand("APPEND", key, value);
-    }
-
-    public void substr(String key, int start, int end) {
-        sendCommand("SUBSTR", key, String.valueOf(start), String.valueOf(end));
-    }
-
-    public void hset(String key, String field, String value) {
-        sendCommand("HSET", key, field, value);
-    }
-
-    public void hget(String key, String field) {
-        sendCommand("HGET", key, field);
-    }
-
-    public void hsetnx(String key, String field, String value) {
-        sendCommand("HSETNX", key, field, value);
-    }
-
-    public void hmset(String key, Map<String, String> hash) {
-        List<String> params = new ArrayList<String>();
-        params.add(key);
-
-        for (String field : hash.keySet()) {
-            params.add(field);
-            params.add(hash.get(field));
-        }
-        sendCommand("HMSET", params.toArray(new String[params.size()]));
-    }
-
-    public void hmget(String key, String... fields) {
-        String[] params = new String[fields.length + 1];
-        params[0] = key;
-        System.arraycopy(fields, 0, params, 1, fields.length);
-        sendCommand("HMGET", params);
-    }
-
-    public void hincrBy(String key, String field, int value) {
-        sendCommand("HINCRBY", key, field, String.valueOf(value));
-    }
-
-    public void hexists(String key, String field) {
-        sendCommand("HEXISTS", key, field);
-    }
-
-    public void hdel(String key, String field) {
-        sendCommand("HDEL", key, field);
-    }
-
-    public void hlen(String key) {
-        sendCommand("HLEN", key);
-    }
-
-    public void hkeys(String key) {
-        sendCommand("HKEYS", key);
-    }
-
-    public void hvals(String key) {
-        sendCommand("HVALS", key);
-    }
-
-    public void hgetAll(String key) {
-        sendCommand("HGETALL", key);
     }
 
     public void rpush(String key, String string) {
@@ -330,14 +253,6 @@ public class Client extends Connection {
         sendCommand("ZINCRBY", key, String.valueOf(score), member);
     }
 
-    public void zrank(String key, String member) {
-        sendCommand("ZRANK", key, member);
-    }
-
-    public void zrevrank(String key, String member) {
-        sendCommand("ZREVRANK", key, member);
-    }
-
     public void zrevrange(String key, int start, int end) {
         sendCommand("ZREVRANGE", key, String.valueOf(start), String
                 .valueOf(end));
@@ -361,21 +276,6 @@ public class Client extends Connection {
         sendCommand("ZSCORE", key, member);
     }
 
-    public void multi() {
-        sendCommand("MULTI");
-        isInMulti = true;
-    }
-
-    public void discard() {
-        sendCommand("DISCARD");
-        isInMulti = false;
-    }
-
-    public void exec() {
-        sendCommand("EXEC");
-        isInMulti = false;
-    }
-
     public void watch(String key) {
         sendCommand("WATCH", key);
     }
@@ -395,10 +295,6 @@ public class Client extends Connection {
         sendCommand("SORT", args.toArray(new String[args.size()]));
     }
 
-    public void blpop(String[] args) {
-        sendCommand("BLPOP", args);
-    }
-
     public void sort(String key, SortingParams sortingParameters, String dstkey) {
         List<String> args = new ArrayList<String>();
         args.add(key);
@@ -412,40 +308,8 @@ public class Client extends Connection {
         sendCommand("SORT", key, "STORE", dstkey);
     }
 
-    public void brpop(String[] args) {
-        sendCommand("BRPOP", args);
-    }
-
     public void auth(String password) {
         sendCommand("AUTH", password);
-    }
-
-    public void subscribe(String... channels) {
-        sendCommand("SUBSCRIBE", channels);
-    }
-
-    public void publish(String channel, String message) {
-        sendCommand("PUBLISH", channel, message);
-    }
-
-    public void unsubscribe() {
-        sendCommand("UNSUBSCRIBE");
-    }
-
-    public void unsubscribe(String... channels) {
-        sendCommand("UNSUBSCRIBE", channels);
-    }
-
-    public void psubscribe(String[] patterns) {
-        sendCommand("PSUBSCRIBE", patterns);
-    }
-
-    public void punsubscribe() {
-        sendCommand("PUNSUBSCRIBE");
-    }
-
-    public void punsubscribe(String... patterns) {
-        sendCommand("PUNSUBSCRIBE", patterns);
     }
 
     public void zcount(String key, double min, double max) {
@@ -480,52 +344,9 @@ public class Client extends Connection {
                 .valueOf(count), "WITHSCORES");
     }
 
-    public void zremrangeByRank(String key, int start, int end) {
-        sendCommand("ZREMRANGEBYRANK", key, String.valueOf(start), String
-                .valueOf(end));
-    }
-
     public void zremrangeByScore(String key, double start, double end) {
         sendCommand("ZREMRANGEBYSCORE", key, String.valueOf(start), String
                 .valueOf(end));
-    }
-
-    public void zunionstore(String dstkey, String... sets) {
-        String[] params = new String[sets.length + 2];
-        params[0] = dstkey;
-        params[1] = String.valueOf(sets.length);
-        System.arraycopy(sets, 0, params, 2, sets.length);
-        sendCommand("ZUNIONSTORE", params);
-    }
-
-    public void zunionstore(String dstkey, ZParams params, String... sets) {
-        List<String> args = new ArrayList<String>();
-        args.add(dstkey);
-        args.add(String.valueOf(sets.length));
-        for (String set : sets) {
-            args.add(set);
-        }
-        args.addAll(params.getParams());
-        sendCommand("ZUNIONSTORE", args.toArray(new String[args.size()]));
-    }
-
-    public void zinterstore(String dstkey, String... sets) {
-        String[] params = new String[sets.length + 2];
-        params[0] = dstkey;
-        params[1] = String.valueOf(sets.length);
-        System.arraycopy(sets, 0, params, 2, sets.length);
-        sendCommand("ZINTERSTORE", params);
-    }
-
-    public void zinterstore(String dstkey, ZParams params, String... sets) {
-        List<String> args = new ArrayList<String>();
-        args.add(dstkey);
-        args.add(String.valueOf(sets.length));
-        for (String set : sets) {
-            args.add(set);
-        }
-        args.addAll(params.getParams());
-        sendCommand("ZINTERSTORE", args.toArray(new String[args.size()]));
     }
 
     public void save() {
@@ -564,44 +385,11 @@ public class Client extends Connection {
         sendCommand("SLAVEOF", "no", "one");
     }
 
-    public void configGet(String pattern) {
-        sendCommand("CONFIG", "GET", pattern);
-    }
-
-    public void configSet(String parameter, String value) {
-        sendCommand("CONFIG", "SET", parameter, value);
-    }
-
-    public void strlen(String key) {
-        sendCommand("STRLEN", key);
-    }
-
     public void sync() {
         sendCommand("SYNC");
     }
 
-    public void lpushx(String key, String string) {
-        sendCommand("LPUSHX", key, string);
-    }
-
-    public void persist(String key) {
-        sendCommand("PERSIST", key);
-    }
-
-    public void rpushx(String key, String string) {
-        sendCommand("RPUSHX", key, string);
-    }
-
     public void echo(String string) {
         sendCommand("ECHO", string);
-    }
-
-    public void linsert(String key, LIST_POSITION where, String pivot,
-            String value) {
-        sendCommand("LINSERT", key, where.toString(), pivot, value);
-    }
-
-    public void debug(DebugParams params) {
-        sendCommand("DEBUG", params.getCommand());
     }
 }

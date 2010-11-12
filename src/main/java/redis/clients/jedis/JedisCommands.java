@@ -1,7 +1,6 @@
 package redis.clients.jedis;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -26,8 +25,6 @@ public interface JedisCommands {
 
     Integer setnx(String key, String value);
 
-    String setex(String key, int seconds, String value);
-
     Integer decrBy(String key, int integer);
 
     Integer decr(String key);
@@ -36,37 +33,9 @@ public interface JedisCommands {
 
     Integer incr(String key);
 
-    Integer append(String key, String value);
+    String rpush(String key, String string);
 
-    String substr(String key, int start, int end);
-
-    Integer hset(String key, String field, String value);
-
-    String hget(String key, String field);
-
-    Integer hsetnx(String key, String field, String value);
-
-    String hmset(String key, Map<String, String> hash);
-
-    List<String> hmget(String key, String... fields);
-
-    Integer hincrBy(String key, String field, int value);
-
-    Integer hexists(String key, String field);
-
-    Integer hdel(String key, String field);
-
-    Integer hlen(String key);
-
-    List<String> hkeys(String key);
-
-    List<String> hvals(String key);
-
-    Map<String, String> hgetAll(String key);
-
-    Integer rpush(String key, String string);
-
-    Integer lpush(String key, String string);
+    String lpush(String key, String string);
 
     Integer llen(String key);
 
@@ -106,10 +75,6 @@ public interface JedisCommands {
 
     Double zincrby(String key, double score, String member);
 
-    Integer zrank(String key, String member);
-
-    Integer zrevrank(String key, String member);
-
     Set<String> zrevrange(String key, int start, int end);
 
     Set<Tuple> zrangeWithScores(String key, int start, int end);
@@ -136,10 +101,5 @@ public interface JedisCommands {
     Set<Tuple> zrangeByScoreWithScores(String key, double min,
             double max, int offset, int count);
 
-    Integer zremrangeByRank(String key, int start, int end);
-
     Integer zremrangeByScore(String key, double start, double end);
-
-    Integer linsert(String key, Client.LIST_POSITION where, String pivot,
-                String value);
 }

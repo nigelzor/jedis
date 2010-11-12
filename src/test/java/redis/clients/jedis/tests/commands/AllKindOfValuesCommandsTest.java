@@ -1,8 +1,5 @@
 package redis.clients.jedis.tests.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
 
 import redis.clients.jedis.JedisException;
@@ -66,13 +63,11 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
 	jedis.set("foo", "bar");
 	jedis.set("foobar", "bar");
 
-	List<String> keys = jedis.keys("foo*");
-	List<String> expected = new ArrayList<String>();
-	expected.add("foo");
-	expected.add("foobar");
+	String keys = jedis.keys("foo*");
+	String expected = "foo foobar";
 	assertEquals(expected, keys);
 
-	expected = new ArrayList<String>();
+	expected = "";
 	keys = jedis.keys("bar*");
 
 	assertEquals(expected, keys);
@@ -80,7 +75,7 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void randomKey() {
-	assertEquals(null, jedis.randomKey());
+	assertEquals("", jedis.randomKey());
 
 	jedis.set("foo", "bar");
 
@@ -218,15 +213,6 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
 	assertEquals(0, jedis.dbSize().intValue());
 	jedis.select(1);
 	assertEquals(0, jedis.dbSize().intValue());
-    }
-
-    @Test
-    public void persist() {
-	jedis.setex("foo", 60 * 60, "bar");
-	assertTrue(jedis.ttl("foo") > 0);
-	int status = jedis.persist("foo");
-	assertEquals(1, status);
-	assertEquals(-1, jedis.ttl("foo").intValue());
     }
 
     @Test

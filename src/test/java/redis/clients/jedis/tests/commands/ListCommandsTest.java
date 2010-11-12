@@ -5,25 +5,25 @@ import java.util.List;
 
 import org.junit.Test;
 
-import redis.clients.jedis.Client;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisException;
 
 public class ListCommandsTest extends JedisCommandTestBase {
+	private static final String OK = "OK";
+	
     @Test
     public void rpush() {
-	int size = jedis.rpush("foo", "bar");
-	assertEquals(1, size);
-	size = jedis.rpush("foo", "foo");
-	assertEquals(2, size);
+	String status = jedis.rpush("foo", "bar");
+	assertEquals(OK, status);
+	status = jedis.rpush("foo", "foo");
+	assertEquals(OK, status);
     }
 
     @Test
     public void lpush() {
-	int size = jedis.lpush("foo", "bar");
-	assertEquals(1, size);
-	size = jedis.lpush("foo", "foo");
-	assertEquals(2, size);
+    String status = jedis.lpush("foo", "bar");
+	assertEquals(OK, status);
+	status = jedis.lpush("foo", "foo");
+	assertEquals(OK, status);
     }
 
     @Test
@@ -202,95 +202,5 @@ public class ListCommandsTest extends JedisCommandTestBase {
 
 	assertEquals(srcExpected, jedis.lrange("foo", 0, 1000));
 	assertEquals(dstExpected, jedis.lrange("dst", 0, 1000));
-    }
-
-    @Test
-    public void blpop() throws InterruptedException {
-	List<String> result = jedis.blpop(1, "foo");
-	assertNull(result);
-
-	new Thread(new Runnable() {
-	    public void run() {
-		try {
-		    Jedis j = createJedis();
-		    j.lpush("foo", "bar");
-		    j.disconnect();
-		} catch (Exception ex) {
-		    fail(ex.getMessage());
-		}
-	    }
-	}).start();
-
-	result = jedis.blpop(1, "foo");
-	assertNotNull(result);
-	assertEquals(2, result.size());
-	assertEquals("foo", result.get(0));
-	assertEquals("bar", result.get(1));
-    }
-
-    @Test
-    public void brpop() throws InterruptedException {
-	List<String> result = jedis.brpop(1, "foo");
-	assertNull(result);
-
-	new Thread(new Runnable() {
-	    public void run() {
-		try {
-		    Jedis j = createJedis();
-		    j.lpush("foo", "bar");
-		    j.disconnect();
-		} catch (Exception ex) {
-		    fail(ex.getMessage());
-		}
-	    }
-	}).start();
-
-	result = jedis.brpop(1, "foo");
-	assertNotNull(result);
-	assertEquals(2, result.size());
-	assertEquals("foo", result.get(0));
-	assertEquals("bar", result.get(1));
-    }
-
-    @Test
-    public void lpushx() {
-	int status = jedis.lpushx("foo", "bar");
-	assertEquals(0, status);
-
-	jedis.lpush("foo", "a");
-	status = jedis.lpushx("foo", "b");
-	assertEquals(2, status);
-    }
-
-    @Test
-    public void rpushx() {
-	int status = jedis.rpushx("foo", "bar");
-	assertEquals(0, status);
-
-	jedis.lpush("foo", "a");
-	status = jedis.rpushx("foo", "b");
-	assertEquals(2, status);
-    }
-
-    @Test
-    public void linsert() {
-	int status = jedis.linsert("foo", Client.LIST_POSITION.BEFORE, "bar",
-		"car");
-	assertEquals(0, status);
-
-	jedis.lpush("foo", "a");
-	status = jedis.linsert("foo", Client.LIST_POSITION.AFTER, "a", "b");
-	assertEquals(2, status);
-
-	List<String> actual = jedis.lrange("foo", 0, 100);
-	List<String> expected = new ArrayList<String>();
-	expected.add("a");
-	expected.add("b");
-
-	assertEquals(expected, actual);
-
-	status = jedis
-		.linsert("foo", Client.LIST_POSITION.BEFORE, "bar", "car");
-	assertEquals(-1, status);
     }
 }

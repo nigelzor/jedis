@@ -2,17 +2,13 @@ package redis.clients.jedis;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import redis.clients.jedis.Client.LIST_POSITION;
-
 public class Jedis implements JedisCommands {
+	
     private Client client = null;
     private String password = null;
 
@@ -176,10 +172,10 @@ public class Jedis implements JedisCommands {
      * @param pattern
      * @return Multi bulk reply
      */
-    public List<String> keys(String pattern) {
+    public String keys(String pattern) {
         runChecks();
         client.keys(pattern);
-        return client.getMultiBulkReply();
+        return client.getBulkReply();
     }
 
     /**
@@ -424,24 +420,6 @@ public class Jedis implements JedisCommands {
     }
 
     /**
-     * The command is exactly equivalent to the following group of commands:
-     * {@link #set(String, String) SET} + {@link #expire(String, int) EXPIRE}.
-     * The operation is atomic.
-     * <p>
-     * Time complexity: O(1)
-     * 
-     * @param key
-     * @param seconds
-     * @param value
-     * @return Status code reply
-     */
-    public String setex(String key, int seconds, String value) {
-        runChecks();
-        client.setex(key, seconds, value);
-        return client.getStatusCodeReply();
-    }
-
-    /**
      * Set the the respective keys to the respective values. MSET will replace
      * old values with new values, while {@link #msetnx(String...) MSETNX} will
      * not perform any operation at all even if just a single key already
@@ -607,267 +585,6 @@ public class Jedis implements JedisCommands {
     }
 
     /**
-     * If the key already exists and is a string, this command appends the
-     * provided value at the end of the string. If the key does not exist it is
-     * created and set as an empty string, so APPEND will be very similar to SET
-     * in this special case.
-     * <p>
-     * Time complexity: O(1). The amortized time complexity is O(1) assuming the
-     * appended value is small and the already present value is of any size,
-     * since the dynamic string library used by Redis will double the free space
-     * available on every reallocation.
-     * 
-     * @param key
-     * @param value
-     * @return Integer reply, specifically the total length of the string after
-     *         the append operation.
-     */
-    public Integer append(String key, String value) {
-        runChecks();
-        client.append(key, value);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Return a subset of the string from offset start to offset end (both
-     * offsets are inclusive). Negative offsets can be used in order to provide
-     * an offset starting from the end of the string. So -1 means the last char,
-     * -2 the penultimate and so forth.
-     * <p>
-     * The function handles out of range requests without raising an error, but
-     * just limiting the resulting range to the actual length of the string.
-     * <p>
-     * Time complexity: O(start+n) (with start being the start index and n the
-     * total length of the requested range). Note that the lookup part of this
-     * command is O(1) so for small strings this is actually an O(1) command.
-     * 
-     * @param key
-     * @param start
-     * @param end
-     * @return Bulk reply
-     */
-    public String substr(String key, int start, int end) {
-        runChecks();
-        client.substr(key, start, end);
-        return client.getBulkReply();
-    }
-
-    /**
-     * 
-     * Set the specified hash field to the specified value.
-     * <p>
-     * If key does not exist, a new key holding a hash is created.
-     * <p>
-     * <b>Time complexity:</b> O(1)
-     * 
-     * @param key
-     * @param field
-     * @param value
-     * @return If the field already exists, and the HSET just produced an update
-     *         of the value, 0 is returned, otherwise if a new field is created
-     *         1 is returned.
-     */
-    public Integer hset(String key, String field, String value) {
-        runChecks();
-        client.hset(key, field, value);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * If key holds a hash, retrieve the value associated to the specified
-     * field.
-     * <p>
-     * If the field is not found or the key does not exist, a special 'nil'
-     * value is returned.
-     * <p>
-     * <b>Time complexity:</b> O(1)
-     * 
-     * @param key
-     * @param field
-     * @return Bulk reply
-     */
-    public String hget(String key, String field) {
-        runChecks();
-        client.hget(key, field);
-        return client.getBulkReply();
-    }
-
-    /**
-     * 
-     * Set the specified hash field to the specified value if the field not
-     * exists. <b>Time complexity:</b> O(1)
-     * 
-     * @param key
-     * @param field
-     * @param value
-     * @return If the field already exists, 0 is returned, otherwise if a new
-     *         field is created 1 is returned.
-     */
-    public Integer hsetnx(String key, String field, String value) {
-        runChecks();
-        client.hsetnx(key, field, value);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Set the respective fields to the respective values. HMSET replaces old
-     * values with new values.
-     * <p>
-     * If key does not exist, a new key holding a hash is created.
-     * <p>
-     * <b>Time complexity:</b> O(N) (with N being the number of fields)
-     * 
-     * @param key
-     * @param hash
-     * @return Always OK because HMSET can't fail
-     */
-    public String hmset(String key, Map<String, String> hash) {
-        runChecks();
-        client.hmset(key, hash);
-        return client.getStatusCodeReply();
-    }
-
-    /**
-     * Retrieve the values associated to the specified fields.
-     * <p>
-     * If some of the specified fields do not exist, nil values are returned.
-     * Non existing keys are considered like empty hashes.
-     * <p>
-     * <b>Time complexity:</b> O(N) (with N being the number of fields)
-     * 
-     * @param key
-     * @param fields
-     * @return Multi Bulk Reply specifically a list of all the values associated
-     *         with the specified fields, in the same order of the request.
-     */
-    public List<String> hmget(String key, String... fields) {
-        runChecks();
-        client.hmget(key, fields);
-        return client.getMultiBulkReply();
-    }
-
-    /**
-     * Increment the number stored at field in the hash at key by value. If key
-     * does not exist, a new key holding a hash is created. If field does not
-     * exist or holds a string, the value is set to 0 before applying the
-     * operation. Since the value argument is signed you can use this command to
-     * perform both increments and decrements.
-     * <p>
-     * The range of values supported by HINCRBY is limited to 64 bit signed
-     * integers.
-     * <p>
-     * <b>Time complexity:</b> O(1)
-     * 
-     * @param key
-     * @param field
-     * @param value
-     * @return Integer reply The new value at field after the increment
-     *         operation.
-     */
-    public Integer hincrBy(String key, String field, int value) {
-        runChecks();
-        client.hincrBy(key, field, value);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Test for existence of a specified field in a hash.
-     * 
-     * <b>Time complexity:</b> O(1)
-     * 
-     * @param key
-     * @param field
-     * @return Return 1 if the hash stored at key contains the specified field.
-     *         Return 0 if the key is not found or the field is not present.
-     */
-    public Integer hexists(String key, String field) {
-        runChecks();
-        client.hexists(key, field);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Remove the specified field from an hash stored at key.
-     * <p>
-     * <b>Time complexity:</b> O(1)
-     * 
-     * @param key
-     * @param field
-     * @return If the field was present in the hash it is deleted and 1 is
-     *         returned, otherwise 0 is returned and no operation is performed.
-     */
-    public Integer hdel(String key, String field) {
-        runChecks();
-        client.hdel(key, field);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Return the number of items in a hash.
-     * <p>
-     * <b>Time complexity:</b> O(1)
-     * 
-     * @param key
-     * @return The number of entries (fields) contained in the hash stored at
-     *         key. If the specified key does not exist, 0 is returned assuming
-     *         an empty hash.
-     */
-    public Integer hlen(String key) {
-        runChecks();
-        client.hlen(key);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Return all the fields in a hash.
-     * <p>
-     * <b>Time complexity:</b> O(N), where N is the total number of entries
-     * 
-     * @param key
-     * @return All the fields names contained into a hash.
-     */
-    public List<String> hkeys(String key) {
-        runChecks();
-        client.hkeys(key);
-        return client.getMultiBulkReply();
-    }
-
-    /**
-     * Return all the values in a hash.
-     * <p>
-     * <b>Time complexity:</b> O(N), where N is the total number of entries
-     * 
-     * @param key
-     * @return All the fields values contained into a hash.
-     */
-    public List<String> hvals(String key) {
-        runChecks();
-        client.hvals(key);
-        return client.getMultiBulkReply();
-    }
-
-    /**
-     * Return all the fields and associated values in a hash.
-     * <p>
-     * <b>Time complexity:</b> O(N), where N is the total number of entries
-     * 
-     * @param key
-     * @return All the fields and values contained into a hash.
-     */
-    public Map<String, String> hgetAll(String key) {
-        runChecks();
-        client.hgetAll(key);
-        List<String> flatHash = client.getMultiBulkReply();
-        Map<String, String> hash = new HashMap<String, String>();
-        Iterator<String> iterator = flatHash.iterator();
-        while (iterator.hasNext()) {
-            hash.put(iterator.next(), iterator.next());
-        }
-
-        return hash;
-    }
-
-    /**
      * Add the string value to the head (LPUSH) or tail (RPUSH) of the list
      * stored at key. If the key does not exist an empty list is created just
      * before the append operation. If the key exists but is not a List an error
@@ -882,10 +599,10 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically, the number of elements inside the
      *         list after the push operation.
      */
-    public Integer rpush(String key, String string) {
+    public String rpush(String key, String string) {
         runChecks();
         client.rpush(key, string);
-        return client.getIntegerReply();
+        return client.getStatusCodeReply();
     }
 
     /**
@@ -903,10 +620,10 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically, the number of elements inside the
      *         list after the push operation.
      */
-    public Integer lpush(String key, String string) {
+    public String lpush(String key, String string) {
         runChecks();
         client.lpush(key, string);
-        return client.getIntegerReply();
+        return client.getStatusCodeReply();
     }
 
     /**
@@ -1511,58 +1228,6 @@ public class Jedis implements JedisCommands {
         return Double.valueOf(newscore);
     }
 
-    /**
-     * Return the rank (or index) or member in the sorted set at key, with
-     * scores being ordered from low to high.
-     * <p>
-     * When the given member does not exist in the sorted set, the special value
-     * 'nil' is returned. The returned rank (or index) of the member is 0-based
-     * for both commands.
-     * <p>
-     * <b>Time complexity:</b>
-     * <p>
-     * O(log(N))
-     * 
-     * @see #zrevrank(String, String)
-     * 
-     * @param key
-     * @param member
-     * @return Integer reply or a nil bulk reply, specifically: the rank of the
-     *         element as an integer reply if the element exists. A nil bulk
-     *         reply if there is no such element.
-     */
-    public Integer zrank(String key, String member) {
-        runChecks();
-        client.zrank(key, member);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Return the rank (or index) or member in the sorted set at key, with
-     * scores being ordered from high to low.
-     * <p>
-     * When the given member does not exist in the sorted set, the special value
-     * 'nil' is returned. The returned rank (or index) of the member is 0-based
-     * for both commands.
-     * <p>
-     * <b>Time complexity:</b>
-     * <p>
-     * O(log(N))
-     * 
-     * @see #zrank(String, String)
-     * 
-     * @param key
-     * @param member
-     * @return Integer reply or a nil bulk reply, specifically: the rank of the
-     *         element as an integer reply if the element exists. A nil bulk
-     *         reply if there is no such element.
-     */
-    public Integer zrevrank(String key, String member) {
-        runChecks();
-        client.zrevrank(key, member);
-        return client.getIntegerReply();
-    }
-
     public Set<String> zrevrange(String key, int start, int end) {
         runChecks();
         client.zrevrange(key, start, end);
@@ -1617,30 +1282,7 @@ public class Jedis implements JedisCommands {
         return (score != null ? new Double(score) : null);
     }
 
-    public Transaction multi() {
-        client.multi();
-        client.getStatusCodeReply();
-        return new Transaction(client);
-    }
-
-    public List<Object> multi(TransactionBlock jedisTransaction) {
-        List<Object> results = null;
-        try {
-            jedisTransaction.setClient(client);
-            multi();
-            jedisTransaction.execute();
-            results = jedisTransaction.exec();
-        } catch (Exception ex) {
-            client.discard();
-        }
-        return results;
-    }
-
     private void runChecks() {
-        if (client.isInMulti()) {
-            throw new JedisException(
-                    "Cannot use Jedis when in Multi. Please use JedisTransaction instead.");
-        }
         try {
             this.connect();
         } catch (UnknownHostException e) {
@@ -1779,93 +1421,6 @@ public class Jedis implements JedisCommands {
     }
 
     /**
-     * BLPOP (and BRPOP) is a blocking list pop primitive. You can see this
-     * commands as blocking versions of LPOP and RPOP able to block if the
-     * specified keys don't exist or contain empty lists.
-     * <p>
-     * The following is a description of the exact semantic. We describe BLPOP
-     * but the two commands are identical, the only difference is that BLPOP
-     * pops the element from the left (head) of the list, and BRPOP pops from
-     * the right (tail).
-     * <p>
-     * <b>Non blocking behavior</b>
-     * <p>
-     * When BLPOP is called, if at least one of the specified keys contain a non
-     * empty list, an element is popped from the head of the list and returned
-     * to the caller together with the name of the key (BLPOP returns a two
-     * elements array, the first element is the key, the second the popped
-     * value).
-     * <p>
-     * Keys are scanned from left to right, so for instance if you issue BLPOP
-     * list1 list2 list3 0 against a dataset where list1 does not exist but
-     * list2 and list3 contain non empty lists, BLPOP guarantees to return an
-     * element from the list stored at list2 (since it is the first non empty
-     * list starting from the left).
-     * <p>
-     * <b>Blocking behavior</b>
-     * <p>
-     * If none of the specified keys exist or contain non empty lists, BLPOP
-     * blocks until some other client performs a LPUSH or an RPUSH operation
-     * against one of the lists.
-     * <p>
-     * Once new data is present on one of the lists, the client finally returns
-     * with the name of the key unblocking it and the popped value.
-     * <p>
-     * When blocking, if a non-zero timeout is specified, the client will
-     * unblock returning a nil special value if the specified amount of seconds
-     * passed without a push operation against at least one of the specified
-     * keys.
-     * <p>
-     * The timeout argument is interpreted as an integer value. A timeout of
-     * zero means instead to block forever.
-     * <p>
-     * <b>Multiple clients blocking for the same keys</b>
-     * <p>
-     * Multiple clients can block for the same key. They are put into a queue,
-     * so the first to be served will be the one that started to wait earlier,
-     * in a first-blpopping first-served fashion.
-     * <p>
-     * <b>blocking POP inside a MULTI/EXEC transaction</b>
-     * <p>
-     * BLPOP and BRPOP can be used with pipelining (sending multiple commands
-     * and reading the replies in batch), but it does not make sense to use
-     * BLPOP or BRPOP inside a MULTI/EXEC block (a Redis transaction).
-     * <p>
-     * The behavior of BLPOP inside MULTI/EXEC when the list is empty is to
-     * return a multi-bulk nil reply, exactly what happens when the timeout is
-     * reached. If you like science fiction, think at it like if inside
-     * MULTI/EXEC the time will flow at infinite speed :)
-     * <p>
-     * Time complexity: O(1)
-     * 
-     * @see #brpop(int, String...)
-     * 
-     * @param timeout
-     * @param keys
-     * @return BLPOP returns a two-elements array via a multi bulk reply in
-     *         order to return both the unblocking key and the popped value.
-     *         <p>
-     *         When a non-zero timeout is specified, and the BLPOP operation
-     *         timed out, the return value is a nil multi bulk reply. Most
-     *         client values will return false or nil accordingly to the
-     *         programming language used.
-     */
-    public List<String> blpop(int timeout, String... keys) {
-        runChecks();
-        List<String> args = new ArrayList<String>();
-        for (String arg : keys) {
-            args.add(arg);
-        }
-        args.add(String.valueOf(timeout));
-
-        client.blpop(args.toArray(new String[args.size()]));
-        client.setTimeoutInfinite();
-        List<String> multiBulkReply = client.getMultiBulkReply();
-        client.rollbackTimeout();
-        return multiBulkReply;
-    }
-
-    /**
      * Sort a Set or a List accordingly to the specified parameters and store
      * the result at dstkey.
      * 
@@ -1908,94 +1463,6 @@ public class Jedis implements JedisCommands {
     }
 
     /**
-     * BLPOP (and BRPOP) is a blocking list pop primitive. You can see this
-     * commands as blocking versions of LPOP and RPOP able to block if the
-     * specified keys don't exist or contain empty lists.
-     * <p>
-     * The following is a description of the exact semantic. We describe BLPOP
-     * but the two commands are identical, the only difference is that BLPOP
-     * pops the element from the left (head) of the list, and BRPOP pops from
-     * the right (tail).
-     * <p>
-     * <b>Non blocking behavior</b>
-     * <p>
-     * When BLPOP is called, if at least one of the specified keys contain a non
-     * empty list, an element is popped from the head of the list and returned
-     * to the caller together with the name of the key (BLPOP returns a two
-     * elements array, the first element is the key, the second the popped
-     * value).
-     * <p>
-     * Keys are scanned from left to right, so for instance if you issue BLPOP
-     * list1 list2 list3 0 against a dataset where list1 does not exist but
-     * list2 and list3 contain non empty lists, BLPOP guarantees to return an
-     * element from the list stored at list2 (since it is the first non empty
-     * list starting from the left).
-     * <p>
-     * <b>Blocking behavior</b>
-     * <p>
-     * If none of the specified keys exist or contain non empty lists, BLPOP
-     * blocks until some other client performs a LPUSH or an RPUSH operation
-     * against one of the lists.
-     * <p>
-     * Once new data is present on one of the lists, the client finally returns
-     * with the name of the key unblocking it and the popped value.
-     * <p>
-     * When blocking, if a non-zero timeout is specified, the client will
-     * unblock returning a nil special value if the specified amount of seconds
-     * passed without a push operation against at least one of the specified
-     * keys.
-     * <p>
-     * The timeout argument is interpreted as an integer value. A timeout of
-     * zero means instead to block forever.
-     * <p>
-     * <b>Multiple clients blocking for the same keys</b>
-     * <p>
-     * Multiple clients can block for the same key. They are put into a queue,
-     * so the first to be served will be the one that started to wait earlier,
-     * in a first-blpopping first-served fashion.
-     * <p>
-     * <b>blocking POP inside a MULTI/EXEC transaction</b>
-     * <p>
-     * BLPOP and BRPOP can be used with pipelining (sending multiple commands
-     * and reading the replies in batch), but it does not make sense to use
-     * BLPOP or BRPOP inside a MULTI/EXEC block (a Redis transaction).
-     * <p>
-     * The behavior of BLPOP inside MULTI/EXEC when the list is empty is to
-     * return a multi-bulk nil reply, exactly what happens when the timeout is
-     * reached. If you like science fiction, think at it like if inside
-     * MULTI/EXEC the time will flow at infinite speed :)
-     * <p>
-     * Time complexity: O(1)
-     * 
-     * @see #blpop(int, String...)
-     * 
-     * @param timeout
-     * @param keys
-     * @return BLPOP returns a two-elements array via a multi bulk reply in
-     *         order to return both the unblocking key and the popped value.
-     *         <p>
-     *         When a non-zero timeout is specified, and the BLPOP operation
-     *         timed out, the return value is a nil multi bulk reply. Most
-     *         client values will return false or nil accordingly to the
-     *         programming language used.
-     */
-    public List<String> brpop(int timeout, String... keys) {
-        runChecks();
-        List<String> args = new ArrayList<String>();
-        for (String arg : keys) {
-            args.add(arg);
-        }
-        args.add(String.valueOf(timeout));
-
-        client.brpop(args.toArray(new String[args.size()]));
-        client.setTimeoutInfinite();
-        List<String> multiBulkReply = client.getMultiBulkReply();
-        client.rollbackTimeout();
-
-        return multiBulkReply;
-    }
-
-    /**
      * Request for authentication in a password protected Redis server. A Redis
      * server can be instructed to require a password before to allow clients to
      * issue commands. This is done using the requirepass directive in the Redis
@@ -2020,23 +1487,6 @@ public class Jedis implements JedisCommands {
         jedisPipeline.setClient(client);
         jedisPipeline.execute();
         return client.getAll();
-    }
-
-    public void subscribe(JedisPubSub jedisPubSub, String... channels) {
-        client.setTimeoutInfinite();
-        jedisPubSub.proceed(client, channels);
-        client.rollbackTimeout();
-    }
-
-    public Integer publish(String channel, String message) {
-        client.publish(channel, message);
-        return client.getIntegerReply();
-    }
-
-    public void psubscribe(JedisPubSub jedisPubSub, String... patterns) {
-        client.setTimeoutInfinite();
-        jedisPubSub.proceedWithPatterns(client, patterns);
-        client.rollbackTimeout();
     }
 
     public Integer zcount(String key, double min, double max) {
@@ -2310,30 +1760,9 @@ public class Jedis implements JedisCommands {
         Set<Tuple> set = new LinkedHashSet<Tuple>();
         Iterator<String> iterator = membersWithScores.iterator();
         while (iterator.hasNext()) {
-            set
-                    .add(new Tuple(iterator.next(), Double.valueOf(iterator
-                            .next())));
+            set.add(new Tuple(iterator.next(), Double.valueOf(iterator.next())));
         }
         return set;
-    }
-
-    /**
-     * Remove all elements in the sorted set at key with rank between start and
-     * end. Start and end are 0-based with rank 0 being the element with the
-     * lowest score. Both start and end can be negative numbers, where they
-     * indicate offsets starting at the element with the highest rank. For
-     * example: -1 is the element with the highest score, -2 the element with
-     * the second highest score and so forth.
-     * <p>
-     * <b>Time complexity:</b> O(log(N))+O(M) with N being the number of
-     * elements in the sorted set and M the number of elements removed by the
-     * operation
-     * 
-     */
-    public Integer zremrangeByRank(String key, int start, int end) {
-        runChecks();
-        client.zremrangeByRank(key, start, end);
-        return client.getIntegerReply();
     }
 
     /**
@@ -2353,184 +1782,6 @@ public class Jedis implements JedisCommands {
     public Integer zremrangeByScore(String key, double start, double end) {
         runChecks();
         client.zremrangeByScore(key, start, end);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Creates a union or intersection of N sorted sets given by keys k1 through
-     * kN, and stores it at dstkey. It is mandatory to provide the number of
-     * input keys N, before passing the input keys and the other (optional)
-     * arguments.
-     * <p>
-     * As the terms imply, the {@link #zinterstore(String, String...)
-     * ZINTERSTORE} command requires an element to be present in each of the
-     * given inputs to be inserted in the result. The
-     * {@link #zunionstore(String, String...) ZUNIONSTORE} command inserts all
-     * elements across all inputs.
-     * <p>
-     * Using the WEIGHTS option, it is possible to add weight to each input
-     * sorted set. This means that the score of each element in the sorted set
-     * is first multiplied by this weight before being passed to the
-     * aggregation. When this option is not given, all weights default to 1.
-     * <p>
-     * With the AGGREGATE option, it's possible to specify how the results of
-     * the union or intersection are aggregated. This option defaults to SUM,
-     * where the score of an element is summed across the inputs where it
-     * exists. When this option is set to be either MIN or MAX, the resulting
-     * set will contain the minimum or maximum score of an element across the
-     * inputs where it exists.
-     * <p>
-     * <b>Time complexity:</b> O(N) + O(M log(M)) with N being the sum of the
-     * sizes of the input sorted sets, and M being the number of elements in the
-     * resulting sorted set
-     * 
-     * @see #zunionstore(String, String...)
-     * @see #zunionstore(String, ZParams, String...)
-     * @see #zinterstore(String, String...)
-     * @see #zinterstore(String, ZParams, String...)
-     * 
-     * @param dstkey
-     * @param sets
-     * @return Integer reply, specifically the number of elements in the sorted
-     *         set at dstkey
-     */
-    public Integer zunionstore(String dstkey, String... sets) {
-        runChecks();
-        client.zunionstore(dstkey, sets);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Creates a union or intersection of N sorted sets given by keys k1 through
-     * kN, and stores it at dstkey. It is mandatory to provide the number of
-     * input keys N, before passing the input keys and the other (optional)
-     * arguments.
-     * <p>
-     * As the terms imply, the {@link #zinterstore(String, String...)
-     * ZINTERSTORE} command requires an element to be present in each of the
-     * given inputs to be inserted in the result. The
-     * {@link #zunionstore(String, String...) ZUNIONSTORE} command inserts all
-     * elements across all inputs.
-     * <p>
-     * Using the WEIGHTS option, it is possible to add weight to each input
-     * sorted set. This means that the score of each element in the sorted set
-     * is first multiplied by this weight before being passed to the
-     * aggregation. When this option is not given, all weights default to 1.
-     * <p>
-     * With the AGGREGATE option, it's possible to specify how the results of
-     * the union or intersection are aggregated. This option defaults to SUM,
-     * where the score of an element is summed across the inputs where it
-     * exists. When this option is set to be either MIN or MAX, the resulting
-     * set will contain the minimum or maximum score of an element across the
-     * inputs where it exists.
-     * <p>
-     * <b>Time complexity:</b> O(N) + O(M log(M)) with N being the sum of the
-     * sizes of the input sorted sets, and M being the number of elements in the
-     * resulting sorted set
-     * 
-     * @see #zunionstore(String, String...)
-     * @see #zunionstore(String, ZParams, String...)
-     * @see #zinterstore(String, String...)
-     * @see #zinterstore(String, ZParams, String...)
-     * 
-     * @param dstkey
-     * @param sets
-     * @param params
-     * @return Integer reply, specifically the number of elements in the sorted
-     *         set at dstkey
-     */
-    public Integer zunionstore(String dstkey, ZParams params, String... sets) {
-        runChecks();
-        client.zunionstore(dstkey, params, sets);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Creates a union or intersection of N sorted sets given by keys k1 through
-     * kN, and stores it at dstkey. It is mandatory to provide the number of
-     * input keys N, before passing the input keys and the other (optional)
-     * arguments.
-     * <p>
-     * As the terms imply, the {@link #zinterstore(String, String...)
-     * ZINTERSTORE} command requires an element to be present in each of the
-     * given inputs to be inserted in the result. The
-     * {@link #zunionstore(String, String...) ZUNIONSTORE} command inserts all
-     * elements across all inputs.
-     * <p>
-     * Using the WEIGHTS option, it is possible to add weight to each input
-     * sorted set. This means that the score of each element in the sorted set
-     * is first multiplied by this weight before being passed to the
-     * aggregation. When this option is not given, all weights default to 1.
-     * <p>
-     * With the AGGREGATE option, it's possible to specify how the results of
-     * the union or intersection are aggregated. This option defaults to SUM,
-     * where the score of an element is summed across the inputs where it
-     * exists. When this option is set to be either MIN or MAX, the resulting
-     * set will contain the minimum or maximum score of an element across the
-     * inputs where it exists.
-     * <p>
-     * <b>Time complexity:</b> O(N) + O(M log(M)) with N being the sum of the
-     * sizes of the input sorted sets, and M being the number of elements in the
-     * resulting sorted set
-     * 
-     * @see #zunionstore(String, String...)
-     * @see #zunionstore(String, ZParams, String...)
-     * @see #zinterstore(String, String...)
-     * @see #zinterstore(String, ZParams, String...)
-     * 
-     * @param dstkey
-     * @param sets
-     * @return Integer reply, specifically the number of elements in the sorted
-     *         set at dstkey
-     */
-    public Integer zinterstore(String dstkey, String... sets) {
-        runChecks();
-        client.zinterstore(dstkey, sets);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Creates a union or intersection of N sorted sets given by keys k1 through
-     * kN, and stores it at dstkey. It is mandatory to provide the number of
-     * input keys N, before passing the input keys and the other (optional)
-     * arguments.
-     * <p>
-     * As the terms imply, the {@link #zinterstore(String, String...)
-     * ZINTERSTORE} command requires an element to be present in each of the
-     * given inputs to be inserted in the result. The
-     * {@link #zunionstore(String, String...) ZUNIONSTORE} command inserts all
-     * elements across all inputs.
-     * <p>
-     * Using the WEIGHTS option, it is possible to add weight to each input
-     * sorted set. This means that the score of each element in the sorted set
-     * is first multiplied by this weight before being passed to the
-     * aggregation. When this option is not given, all weights default to 1.
-     * <p>
-     * With the AGGREGATE option, it's possible to specify how the results of
-     * the union or intersection are aggregated. This option defaults to SUM,
-     * where the score of an element is summed across the inputs where it
-     * exists. When this option is set to be either MIN or MAX, the resulting
-     * set will contain the minimum or maximum score of an element across the
-     * inputs where it exists.
-     * <p>
-     * <b>Time complexity:</b> O(N) + O(M log(M)) with N being the sum of the
-     * sizes of the input sorted sets, and M being the number of elements in the
-     * resulting sorted set
-     * 
-     * @see #zunionstore(String, String...)
-     * @see #zunionstore(String, ZParams, String...)
-     * @see #zinterstore(String, String...)
-     * @see #zinterstore(String, ZParams, String...)
-     * 
-     * @param dstkey
-     * @param sets
-     * @param params
-     * @return Integer reply, specifically the number of elements in the sorted
-     *         set at dstkey
-     */
-    public Integer zinterstore(String dstkey, ZParams params, String... sets) {
-        runChecks();
-        client.zinterstore(dstkey, params, sets);
         return client.getIntegerReply();
     }
 
@@ -2727,138 +1978,17 @@ public class Jedis implements JedisCommands {
         return client.getStatusCodeReply();
     }
 
-    /**
-     * Retrieve the configuration of a running Redis server. Not all the
-     * configuration parameters are supported.
-     * <p>
-     * CONFIG GET returns the current configuration parameters. This sub command
-     * only accepts a single argument, that is glob style pattern. All the
-     * configuration parameters matching this parameter are reported as a list
-     * of key-value pairs.
-     * <p>
-     * <b>Example:</b>
-     * 
-     * <pre>
-     * $ redis-cli config get '*'
-     * 1. "dbfilename"
-     * 2. "dump.rdb"
-     * 3. "requirepass"
-     * 4. (nil)
-     * 5. "masterauth"
-     * 6. (nil)
-     * 7. "maxmemory"
-     * 8. "0\n"
-     * 9. "appendfsync"
-     * 10. "everysec"
-     * 11. "save"
-     * 12. "3600 1 300 100 60 10000"
-     * 
-     * $ redis-cli config get 'm*'
-     * 1. "masterauth"
-     * 2. (nil)
-     * 3. "maxmemory"
-     * 4. "0\n"
-     * </pre>
-     * 
-     * @param pattern
-     * @return Bulk reply.
-     */
-    public List<String> configGet(String pattern) {
-        client.configGet(pattern);
-        return client.getMultiBulkReply();
-    }
-
-    /**
-     * Alter the configuration of a running Redis server. Not all the
-     * configuration parameters are supported.
-     * <p>
-     * The list of configuration parameters supported by CONFIG SET can be
-     * obtained issuing a {@link #configGet(String) CONFIG GET *} command.
-     * <p>
-     * The configuration set using CONFIG SET is immediately loaded by the Redis
-     * server that will start acting as specified starting from the next
-     * command.
-     * <p>
-     * 
-     * <b>Parameters value format</b>
-     * <p>
-     * The value of the configuration parameter is the same as the one of the
-     * same parameter in the Redis configuration file, with the following
-     * exceptions:
-     * <p>
-     * <ul>
-     * <li>The save paramter is a list of space-separated integers. Every pair
-     * of integers specify the time and number of changes limit to trigger a
-     * save. For instance the command CONFIG SET save "3600 10 60 10000" will
-     * configure the server to issue a background saving of the RDB file every
-     * 3600 seconds if there are at least 10 changes in the dataset, and every
-     * 60 seconds if there are at least 10000 changes. To completely disable
-     * automatic snapshots just set the parameter as an empty string.
-     * <li>All the integer parameters representing memory are returned and
-     * accepted only using bytes as unit.
-     * </ul>
-     * 
-     * @param parameter
-     * @param value
-     * @return Status code reply
-     */
-    public String configSet(String parameter, String value) {
-        client.configSet(parameter, value);
-        return client.getStatusCodeReply();
-    }
-
     public boolean isConnected() {
         return client.isConnected();
-    }
-
-    public Integer strlen(String key) {
-        client.strlen(key);
-        return client.getIntegerReply();
     }
 
     public void sync() {
         client.sync();
     }
 
-    public Integer lpushx(String key, String string) {
-        client.lpushx(key, string);
-        return client.getIntegerReply();
-    }
-
-    /**
-     * Undo a {@link #expire(String, int) expire} at turning the expire key into
-     * a normal key.
-     * <p>
-     * Time complexity: O(1)
-     * 
-     * @param key
-     * @return Integer reply, specifically: 1: the key is now persist. 0: the
-     *         key is not persist (only happens when key not set).
-     */
-    public Integer persist(String key) {
-        client.persist(key);
-        return client.getIntegerReply();
-    }
-
-    public Integer rpushx(String key, String string) {
-        client.rpushx(key, string);
-        return client.getIntegerReply();
-    }
-
     public String echo(String string) {
         client.echo(string);
         return client.getBulkReply();
-    }
-
-    public Integer linsert(String key, LIST_POSITION where, String pivot,
-            String value) {
-        client.linsert(key, where, pivot, value);
-        return client.getIntegerReply();
-    }
-
-    public String debug(DebugParams params) {
-        client.debug(params);
-        return client.getStatusCodeReply();
     }
 
     public Client getClient() {
