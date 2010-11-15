@@ -42,7 +42,7 @@ public class JedisPool extends FixedResourcePool<Jedis> {
     protected Jedis createResource() {
 	Jedis jedis = new Jedis(this.host, this.port, this.timeout);
 	boolean done = false;
-	while (!done) {
+	while (!done && !finishing) {
 	    try {
 		jedis.connect();
 		if (password != null) {

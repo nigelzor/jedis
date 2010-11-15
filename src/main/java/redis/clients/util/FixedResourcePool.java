@@ -56,6 +56,7 @@ public abstract class FixedResourcePool<T> {
      * Generic Repair Thread
      */
     protected class RepairThread extends Thread {
+	@Override
 	public void run() {
 
 	    // Contribute to the repairing and validation effort until the pool
@@ -74,7 +75,7 @@ public abstract class FixedResourcePool<T> {
 			continue;
 		    }
 		} catch (InterruptedException e) {
-		    if (logger.isLoggable(Level.SEVERE)) {
+		    if (logger.isLoggable(Level.SEVERE) && !finishing) {
 			logger.severe(e.getMessage());
 		    }
 		    continue;
@@ -218,7 +219,7 @@ public abstract class FixedResourcePool<T> {
     private RepairThread[] repairThreads;
     private Timer t;
     private boolean initializated = false;
-    private boolean finishing = false;
+    protected volatile boolean finishing = false;
 
     /*
      * Pool configuration parameters
