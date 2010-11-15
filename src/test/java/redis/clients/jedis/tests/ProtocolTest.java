@@ -76,7 +76,7 @@ public class ProtocolTest extends Assert {
     public void integerReply() {
 	InputStream is = new ByteArrayInputStream(":123\r\n".getBytes());
 	Protocol protocol = new Protocol();
-	int response = (Integer) protocol.read(new RedisInputStream(is));
+	long response = (Long) protocol.read(new RedisInputStream(is));
 	assertEquals(123, response);
     }
 
@@ -106,7 +106,7 @@ public class ProtocolTest extends Assert {
 	List<Object> expected2 = new ArrayList<Object>();
 	expected2.add("foo");
 	expected2.add("OK");
-	expected2.add(1000);
+	expected2.add(1000L);
 	List<Object> sub = new ArrayList<Object>();
 	sub.add("foo");
 	sub.add("bar");

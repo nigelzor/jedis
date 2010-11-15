@@ -11,7 +11,7 @@ import org.junit.Test;
 public class HashesCommandsTest extends JedisCommandTestBase {
     @Test
     public void hset() {
-	int status = jedis.hset("foo", "bar", "car");
+	long status = jedis.hset("foo", "bar", "car");
 	assertEquals(1, status);
 	status = jedis.hset("foo", "bar", "foo");
 	assertEquals(0, status);
@@ -27,7 +27,7 @@ public class HashesCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void hsetnx() {
-	int status = jedis.hsetnx("foo", "bar", "car");
+	long status = jedis.hsetnx("foo", "bar", "car");
 	assertEquals(1, status);
 	assertEquals("car", jedis.hget("foo", "bar"));
 
@@ -69,7 +69,7 @@ public class HashesCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void hincrBy() {
-	int value = jedis.hincrBy("foo", "bar", 1);
+	long value = jedis.hincrBy("foo", "bar", 1);
 	assertEquals(1, value);
 	value = jedis.hincrBy("foo", "bar", -1);
 	assertEquals(0, value);

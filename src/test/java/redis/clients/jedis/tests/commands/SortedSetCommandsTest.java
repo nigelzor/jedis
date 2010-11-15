@@ -11,7 +11,7 @@ import redis.clients.jedis.ZParams;
 public class SortedSetCommandsTest extends JedisCommandTestBase {
     @Test
     public void zadd() {
-        int status = jedis.zadd("foo", 1d, "a");
+        long status = jedis.zadd("foo", 1d, "a");
         assertEquals(1, status);
 
         status = jedis.zadd("foo", 10d, "b");
@@ -67,7 +67,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         jedis.zadd("foo", 1d, "a");
         jedis.zadd("foo", 2d, "b");
 
-        int status = jedis.zrem("foo", "a");
+        long status = jedis.zrem("foo", "a");
 
         Set<String> expected = new LinkedHashSet<String>();
         expected.add("b");
@@ -100,7 +100,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         jedis.zadd("foo", 1d, "a");
         jedis.zadd("foo", 2d, "b");
 
-        Integer rank = jedis.zrank("foo", "a");
+        Long rank = jedis.zrank("foo", "a");
         assertEquals(0, rank.intValue());
 
         rank = jedis.zrank("foo", "b");
@@ -115,7 +115,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         jedis.zadd("foo", 1d, "a");
         jedis.zadd("foo", 2d, "b");
 
-        int rank = jedis.zrevrank("foo", "a");
+        long rank = jedis.zrevrank("foo", "a");
         assertEquals(1, rank);
 
         rank = jedis.zrevrank("foo", "b");
@@ -167,7 +167,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         jedis.zadd("foo", 0.1d, "c");
         jedis.zadd("foo", 2d, "a");
 
-        int size = jedis.zcard("foo");
+        long size = jedis.zcard("foo");
         assertEquals(3, size);
     }
 
@@ -195,7 +195,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         jedis.zadd("foo", 0.1d, "c");
         jedis.zadd("foo", 2d, "a");
 
-        int result = jedis.zcount("foo", 0.01d, 2.1d);
+        long result = jedis.zcount("foo", 0.01d, 2.1d);
 
         assertEquals(2, result);
     }
@@ -269,7 +269,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         jedis.zadd("foo", 0.1d, "c");
         jedis.zadd("foo", 2d, "a");
 
-        int result = jedis.zremrangeByRank("foo", 0, 0);
+        long result = jedis.zremrangeByRank("foo", 0, 0);
 
         assertEquals(1, result);
 
@@ -287,7 +287,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         jedis.zadd("foo", 0.1d, "c");
         jedis.zadd("foo", 2d, "a");
 
-        int result = jedis.zremrangeByScore("foo", 0, 2);
+        long result = jedis.zremrangeByScore("foo", 0, 2);
 
         assertEquals(2, result);
 
@@ -304,7 +304,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         jedis.zadd("bar", 2, "a");
         jedis.zadd("bar", 2, "b");
 
-        int result = jedis.zunionstore("dst", "foo", "bar");
+        long result = jedis.zunionstore("dst", "foo", "bar");
 
         assertEquals(2, result);
 
@@ -325,7 +325,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         ZParams params = new ZParams();
         params.weights(2, 2);
         params.aggregate(ZParams.Aggregate.SUM);
-        int result = jedis.zunionstore("dst", params, "foo", "bar");
+        long result = jedis.zunionstore("dst", params, "foo", "bar");
 
         assertEquals(2, result);
 
@@ -342,7 +342,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         jedis.zadd("foo", 2, "b");
         jedis.zadd("bar", 2, "a");
 
-        int result = jedis.zinterstore("dst", "foo", "bar");
+        long result = jedis.zinterstore("dst", "foo", "bar");
 
         assertEquals(1, result);
 
@@ -361,7 +361,7 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         ZParams params = new ZParams();
         params.weights(2, 2);
         params.aggregate(ZParams.Aggregate.SUM);
-        int result = jedis.zinterstore("dst", params, "foo", "bar");
+        long result = jedis.zinterstore("dst", params, "foo", "bar");
 
         assertEquals(1, result);
 

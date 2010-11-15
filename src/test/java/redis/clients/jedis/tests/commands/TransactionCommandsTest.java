@@ -15,6 +15,7 @@ import redis.clients.jedis.TransactionBlock;
 
 public class TransactionCommandsTest extends JedisCommandTestBase {
 	Jedis nj;
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -41,16 +42,17 @@ public class TransactionCommandsTest extends JedisCommandTestBase {
 	List<Object> response = trans.exec();
 
 	List<Object> expected = new ArrayList<Object>();
-	expected.add(1);
-	expected.add(1);
-	expected.add(2);
+	expected.add(1L);
+	expected.add(1L);
+	expected.add(2L);
 	assertEquals(expected, response);
     }
 
     @Test
     public void multiBlock() {
 	List<Object> response = jedis.multi(new TransactionBlock() {
-	    public void execute() {
+	    @Override
+		public void execute() {
 		String status = sadd("foo", "a");
 		assertEquals("QUEUED", status);
 
@@ -63,9 +65,9 @@ public class TransactionCommandsTest extends JedisCommandTestBase {
 	});
 
 	List<Object> expected = new ArrayList<Object>();
-	expected.add(1);
-	expected.add(1);
-	expected.add(2);
+	expected.add(1L);
+	expected.add(1L);
+	expected.add(2L);
 	assertEquals(expected, response);
     }
 

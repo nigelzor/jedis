@@ -12,7 +12,7 @@ import redis.clients.jedis.JedisException;
 public class ListCommandsTest extends JedisCommandTestBase {
     @Test
     public void rpush() {
-	int size = jedis.rpush("foo", "bar");
+	long size = jedis.rpush("foo", "bar");
 	assertEquals(1, size);
 	size = jedis.rpush("foo", "foo");
 	assertEquals(2, size);
@@ -20,7 +20,7 @@ public class ListCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void lpush() {
-	int size = jedis.lpush("foo", "bar");
+	long size = jedis.lpush("foo", "bar");
 	assertEquals(1, size);
 	size = jedis.lpush("foo", "foo");
 	assertEquals(2, size);
@@ -122,7 +122,7 @@ public class ListCommandsTest extends JedisCommandTestBase {
 	jedis.lpush("foo", "b");
 	jedis.lpush("foo", "a");
 
-	int count = jedis.lrem("foo", -2, "hello");
+	long count = jedis.lrem("foo", -2, "hello");
 
 	List<String> expected = new ArrayList<String>();
 	expected.add("a");
@@ -254,7 +254,7 @@ public class ListCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void lpushx() {
-	int status = jedis.lpushx("foo", "bar");
+	long status = jedis.lpushx("foo", "bar");
 	assertEquals(0, status);
 
 	jedis.lpush("foo", "a");
@@ -264,7 +264,7 @@ public class ListCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void rpushx() {
-	int status = jedis.rpushx("foo", "bar");
+	long status = jedis.rpushx("foo", "bar");
 	assertEquals(0, status);
 
 	jedis.lpush("foo", "a");
@@ -274,7 +274,7 @@ public class ListCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void linsert() {
-	int status = jedis.linsert("foo", Client.LIST_POSITION.BEFORE, "bar",
+	long status = jedis.linsert("foo", Client.LIST_POSITION.BEFORE, "bar",
 		"car");
 	assertEquals(0, status);
 

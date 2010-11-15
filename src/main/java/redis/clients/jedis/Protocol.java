@@ -95,9 +95,9 @@ public final class Protocol {
         return new String(read, CHARSET);
     }
 
-    private Integer processInteger(RedisInputStream is) {
+    private Long processInteger(RedisInputStream is) {
         String num = is.readLine();
-        return Integer.valueOf(num);
+        return Long.valueOf(num);
     }
 
     private List<Object> processMultiBulkReply(RedisInputStream is) {
