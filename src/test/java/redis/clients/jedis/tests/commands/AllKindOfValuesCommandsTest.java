@@ -16,7 +16,7 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
 	String status = jedis.set("foo", "bar");
 	assertEquals("OK", status);
 
-	int reply = jedis.exists("foo");
+	long reply = jedis.exists("foo");
 	assertEquals(1, reply);
 
 	reply = jedis.del("foo");
@@ -32,7 +32,7 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
 	jedis.set("foo2", "bar2");
 	jedis.set("foo3", "bar3");
 
-	int reply = jedis.del("foo1", "foo2", "foo3");
+	long reply = jedis.del("foo1", "foo2", "foo3");
 	assertEquals(3, reply);
 
 	reply = jedis.exists("foo1");
@@ -109,7 +109,7 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
     @Test
     public void renamenx() {
 	jedis.set("foo", "bar");
-	int status = jedis.renamenx("foo", "bar");
+	long status = jedis.renamenx("foo", "bar");
 	assertEquals(1, status);
 
 	jedis.set("foo", "bar");
@@ -119,7 +119,7 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void dbSize() {
-	int size = jedis.dbSize();
+	long size = jedis.dbSize();
 	assertEquals(0, size);
 
 	jedis.set("foo", "bar");
@@ -129,7 +129,7 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void expire() {
-	int status = jedis.expire("foo", 20);
+	long status = jedis.expire("foo", 20);
 	assertEquals(0, status);
 
 	jedis.set("foo", "bar");
@@ -141,7 +141,7 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
     public void expireAt() {
 	long unixTime = (System.currentTimeMillis() / 1000L) + 20;
 
-	int status = jedis.expireAt("foo", unixTime);
+	long status = jedis.expireAt("foo", unixTime);
 	assertEquals(0, status);
 
 	jedis.set("foo", "bar");
@@ -152,7 +152,7 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void ttl() {
-	int ttl = jedis.ttl("foo");
+	long ttl = jedis.ttl("foo");
 	assertEquals(-1, ttl);
 
 	jedis.set("foo", "bar");
@@ -177,7 +177,7 @@ public class AllKindOfValuesCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void move() {
-	int status = jedis.move("foo", 1);
+	long status = jedis.move("foo", 1);
 	assertEquals(0, status);
 
 	jedis.set("foo", "bar");

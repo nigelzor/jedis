@@ -44,7 +44,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.get(key);
     }
 
-    public Integer exists(String key) {
+    public Long exists(String key) {
         Jedis j = getShard(key);
         return j.exists(key);
     }
@@ -54,17 +54,17 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.type(key);
     }
 
-    public Integer expire(String key, int seconds) {
+    public Long expire(String key, int seconds) {
         Jedis j = getShard(key);
         return j.expire(key, seconds);
     }
 
-    public Integer expireAt(String key, long unixTime) {
+    public Long expireAt(String key, long unixTime) {
         Jedis j = getShard(key);
         return j.expireAt(key, unixTime);
     }
 
-    public Integer ttl(String key) {
+    public Long ttl(String key) {
         Jedis j = getShard(key);
         return j.ttl(key);
     }
@@ -74,27 +74,27 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.getSet(key, value);
     }
 
-    public Integer setnx(String key, String value) {
+    public Long setnx(String key, String value) {
         Jedis j = getShard(key);
         return j.setnx(key, value);
     }
 
-    public Integer decrBy(String key, int integer) {
+    public Long decrBy(String key, int integer) {
         Jedis j = getShard(key);
         return j.decrBy(key, integer);
     }
 
-    public Integer decr(String key) {
+    public Long decr(String key) {
         Jedis j = getShard(key);
         return j.decr(key);
     }
 
-    public Integer incrBy(String key, int integer) {
+    public Long incrBy(String key, int integer) {
         Jedis j = getShard(key);
         return j.incrBy(key, integer);
     }
 
-    public Integer incr(String key) {
+    public Long incr(String key) {
         Jedis j = getShard(key);
         return j.incr(key);
     }
@@ -109,7 +109,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.lpush(key, string);
     }
 
-    public Integer llen(String key) {
+    public Long llen(String key) {
         Jedis j = getShard(key);
         return j.llen(key);
     }
@@ -134,7 +134,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.lset(key, index, value);
     }
 
-    public Integer lrem(String key, int count, String value) {
+    public Long lrem(String key, int count, String value) {
         Jedis j = getShard(key);
         return j.lrem(key, count, value);
     }
@@ -149,7 +149,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.rpop(key);
     }
 
-    public Integer sadd(String key, String member) {
+    public Long sadd(String key, String member) {
         Jedis j = getShard(key);
         return j.sadd(key, member);
     }
@@ -159,7 +159,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.smembers(key);
     }
 
-    public Integer srem(String key, String member) {
+    public Long srem(String key, String member) {
         Jedis j = getShard(key);
         return j.srem(key, member);
     }
@@ -169,12 +169,12 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.spop(key);
     }
 
-    public Integer scard(String key) {
+    public Long scard(String key) {
         Jedis j = getShard(key);
         return j.scard(key);
     }
 
-    public Integer sismember(String key, String member) {
+    public Long sismember(String key, String member) {
         Jedis j = getShard(key);
         return j.sismember(key, member);
     }
@@ -184,7 +184,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.srandmember(key);
     }
 
-    public Integer zadd(String key, double score, String member) {
+    public Long zadd(String key, double score, String member) {
         Jedis j = getShard(key);
         return j.zadd(key, score, member);
     }
@@ -194,7 +194,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.zrange(key, start, end);
     }
 
-    public Integer zrem(String key, String member) {
+    public Long zrem(String key, String member) {
         Jedis j = getShard(key);
         return j.zrem(key, member);
     }
@@ -219,7 +219,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.zrevrangeWithScores(key, start, end);
     }
 
-    public Integer zcard(String key) {
+    public Long zcard(String key) {
         Jedis j = getShard(key);
         return j.zcard(key);
     }
@@ -239,7 +239,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.sort(key, sortingParameters);
     }
 
-    public Integer zcount(String key, double min, double max) {
+    public Long zcount(String key, double min, double max) {
         Jedis j = getShard(key);
         return j.zcount(key, min, max);
     }
@@ -266,7 +266,7 @@ public class ShardedJedis extends Sharded<Jedis, JedisShardInfo> implements
         return j.zrangeByScoreWithScores(key, min, max, offset, count);
     }
 
-    public Integer zremrangeByScore(String key, double start, double end) {
+    public Long zremrangeByScore(String key, double start, double end) {
         Jedis j = getShard(key);
         return j.zremrangeByScore(key, start, end);
     }

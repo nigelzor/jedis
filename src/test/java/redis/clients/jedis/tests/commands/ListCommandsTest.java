@@ -20,7 +20,7 @@ public class ListCommandsTest extends JedisCommandTestBase {
 
     @Test
     public void lpush() {
-    String status = jedis.lpush("foo", "bar");
+	String status = jedis.lpush("foo", "bar");
 	assertEquals(OK, status);
 	status = jedis.lpush("foo", "foo");
 	assertEquals(OK, status);
@@ -122,7 +122,7 @@ public class ListCommandsTest extends JedisCommandTestBase {
 	jedis.lpush("foo", "b");
 	jedis.lpush("foo", "a");
 
-	int count = jedis.lrem("foo", -2, "hello");
+	long count = jedis.lrem("foo", -2, "hello");
 
 	List<String> expected = new ArrayList<String>();
 	expected.add("a");

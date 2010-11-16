@@ -87,7 +87,7 @@ public class Jedis implements JedisCommands {
      * @param key
      * @return Integer reply, "0" if the key exists, otherwise "1"
      */
-    public Integer exists(String key) {
+    public Long exists(String key) {
         runChecks();
         client.exists(key);
         return client.getIntegerReply();
@@ -103,7 +103,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically: an integer greater than 0 if one or
      *         more keys were removed 0 if none of the specified key existed
      */
-    public Integer del(String... keys) {
+    public Long del(String... keys) {
         runChecks();
         client.del(keys);
         return client.getIntegerReply();
@@ -220,7 +220,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically: 1 if the key was renamed 0 if the
      *         target key already exist
      */
-    public Integer renamenx(String oldkey, String newkey) {
+    public Long renamenx(String oldkey, String newkey) {
         runChecks();
         client.renamenx(oldkey, newkey);
         return client.getIntegerReply();
@@ -231,7 +231,7 @@ public class Jedis implements JedisCommands {
      * 
      * @return Integer reply
      */
-    public Integer dbSize() {
+    public Long dbSize() {
         runChecks();
         client.dbSize();
         return client.getIntegerReply();
@@ -265,7 +265,7 @@ public class Jedis implements JedisCommands {
      *         2.1.3 will happily update the timeout), or the key does not
      *         exist.
      */
-    public Integer expire(String key, int seconds) {
+    public Long expire(String key, int seconds) {
         runChecks();
         client.expire(key, seconds);
         return client.getIntegerReply();
@@ -301,7 +301,7 @@ public class Jedis implements JedisCommands {
      *         2.1.3 will happily update the timeout), or the key does not
      *         exist.
      */
-    public Integer expireAt(String key, long unixTime) {
+    public Long expireAt(String key, long unixTime) {
         runChecks();
         client.expireAt(key, unixTime);
         return client.getIntegerReply();
@@ -318,7 +318,7 @@ public class Jedis implements JedisCommands {
      *         key that has an EXPIRE. If the Key does not exists or does not
      *         have an associated expire, -1 is returned.
      */
-    public Integer ttl(String key) {
+    public Long ttl(String key) {
         runChecks();
         client.ttl(key);
         return client.getIntegerReply();
@@ -350,7 +350,7 @@ public class Jedis implements JedisCommands {
      *         was not moved because already present on the target DB or was not
      *         found in the current DB.
      */
-    public Integer move(String key, int dbIndex) {
+    public Long move(String key, int dbIndex) {
         runChecks();
         client.move(key, dbIndex);
         return client.getIntegerReply();
@@ -413,7 +413,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically: 1 if the key was set 0 if the key
      *         was not set
      */
-    public Integer setnx(String key, String value) {
+    public Long setnx(String key, String value) {
         runChecks();
         client.setnx(key, value);
         return client.getIntegerReply();
@@ -466,7 +466,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically: 1 if the all the keys were set 0 if
      *         no key was set (at least one key already existed)
      */
-    public Integer msetnx(String... keysvalues) {
+    public Long msetnx(String... keysvalues) {
         runChecks();
         client.msetnx(keysvalues);
         return client.getIntegerReply();
@@ -494,7 +494,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, this commands will reply with the new value of key
      *         after the increment.
      */
-    public Integer decrBy(String key, int integer) {
+    public Long decrBy(String key, int integer) {
         runChecks();
         client.decrBy(key, integer);
         return client.getIntegerReply();
@@ -522,7 +522,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, this commands will reply with the new value of key
      *         after the increment.
      */
-    public Integer decr(String key) {
+    public Long decr(String key) {
         runChecks();
         client.decr(key);
         return client.getIntegerReply();
@@ -550,7 +550,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, this commands will reply with the new value of key
      *         after the increment.
      */
-    public Integer incrBy(String key, int integer) {
+    public Long incrBy(String key, int integer) {
         runChecks();
         client.incrBy(key, integer);
         return client.getIntegerReply();
@@ -578,7 +578,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, this commands will reply with the new value of key
      *         after the increment.
      */
-    public Integer incr(String key) {
+    public Long incr(String key) {
         runChecks();
         client.incr(key);
         return client.getIntegerReply();
@@ -636,7 +636,7 @@ public class Jedis implements JedisCommands {
      * @param key
      * @return The length of the list.
      */
-    public Integer llen(String key) {
+    public Long llen(String key) {
         runChecks();
         client.llen(key);
         return client.getIntegerReply();
@@ -796,7 +796,7 @@ public class Jedis implements JedisCommands {
      * @return Integer Reply, specifically: The number of removed elements if
      *         the operation succeeded
      */
-    public Integer lrem(String key, int count, String value) {
+    public Long lrem(String key, int count, String value) {
         runChecks();
         client.lrem(key, count, value);
         return client.getIntegerReply();
@@ -877,7 +877,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically: 1 if the new element was added 0 if
      *         the element was already a member of the set
      */
-    public Integer sadd(String key, String member) {
+    public Long sadd(String key, String member) {
         runChecks();
         client.sadd(key, member);
         return client.getIntegerReply();
@@ -911,7 +911,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically: 1 if the new element was removed 0
      *         if the new element was not a member of the set
      */
-    public Integer srem(String key, String member) {
+    public Long srem(String key, String member) {
         runChecks();
         client.srem(key, member);
         return client.getIntegerReply();
@@ -958,7 +958,7 @@ public class Jedis implements JedisCommands {
      *         element was not found on the first set and no operation was
      *         performed
      */
-    public Integer smove(String srckey, String dstkey, String member) {
+    public Long smove(String srckey, String dstkey, String member) {
         runChecks();
         client.smove(srckey, dstkey, member);
         return client.getIntegerReply();
@@ -972,7 +972,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically: the cardinality (number of elements)
      *         of the set as an integer.
      */
-    public Integer scard(String key) {
+    public Long scard(String key) {
         runChecks();
         client.scard(key);
         return client.getIntegerReply();
@@ -990,7 +990,7 @@ public class Jedis implements JedisCommands {
      *         set 0 if the element is not a member of the set OR if the key
      *         does not exist
      */
-    public Integer sismember(String key, String member) {
+    public Long sismember(String key, String member) {
         runChecks();
         client.sismember(key, member);
         return client.getIntegerReply();
@@ -1033,7 +1033,7 @@ public class Jedis implements JedisCommands {
      * @param keys
      * @return Status code reply
      */
-    public Integer sinterstore(String dstkey, String... keys) {
+    public Long sinterstore(String dstkey, String... keys) {
         runChecks();
         client.sinterstore(dstkey, keys);
         return client.getIntegerReply();
@@ -1074,7 +1074,7 @@ public class Jedis implements JedisCommands {
      * @param keys
      * @return Status code reply
      */
-    public Integer sunionstore(String dstkey, String... keys) {
+    public Long sunionstore(String dstkey, String... keys) {
         runChecks();
         client.sunionstore(dstkey, keys);
         return client.getIntegerReply();
@@ -1118,7 +1118,7 @@ public class Jedis implements JedisCommands {
      * @param keys
      * @return Status code reply
      */
-    public Integer sdiffstore(String dstkey, String... keys) {
+    public Long sdiffstore(String dstkey, String... keys) {
         runChecks();
         client.sdiffstore(dstkey, keys);
         return client.getIntegerReply();
@@ -1163,7 +1163,7 @@ public class Jedis implements JedisCommands {
      *         the element was already a member of the sorted set and the score
      *         was updated
      */
-    public Integer zadd(String key, double score, String member) {
+    public Long zadd(String key, double score, String member) {
         runChecks();
         client.zadd(key, score, member);
         return client.getIntegerReply();
@@ -1191,7 +1191,7 @@ public class Jedis implements JedisCommands {
      * @return Integer reply, specifically: 1 if the new element was removed 0
      *         if the new element was not a member of the set
      */
-    public Integer zrem(String key, String member) {
+    public Long zrem(String key, String member) {
         runChecks();
         client.zrem(key, member);
         return client.getIntegerReply();
@@ -1258,7 +1258,7 @@ public class Jedis implements JedisCommands {
      * @param key
      * @return the cardinality (number of elements) of the set as an integer.
      */
-    public Integer zcard(String key) {
+    public Long zcard(String key) {
         runChecks();
         client.zcard(key);
         return client.getIntegerReply();
@@ -1433,7 +1433,7 @@ public class Jedis implements JedisCommands {
      * @param dstkey
      * @return The number of elements of the list at dstkey.
      */
-    public Integer sort(String key, SortingParams sortingParameters,
+    public Long sort(String key, SortingParams sortingParameters,
             String dstkey) {
         runChecks();
         client.sort(key, sortingParameters, dstkey);
@@ -1456,7 +1456,7 @@ public class Jedis implements JedisCommands {
      * @param dstkey
      * @return The number of elements of the list at dstkey.
      */
-    public Integer sort(String key, String dstkey) {
+    public Long sort(String key, String dstkey) {
         runChecks();
         client.sort(key, dstkey);
         return client.getIntegerReply();
@@ -1489,7 +1489,7 @@ public class Jedis implements JedisCommands {
         return client.getAll();
     }
 
-    public Integer zcount(String key, double min, double max) {
+    public Long zcount(String key, double min, double max) {
         runChecks();
         client.zcount(key, min, max);
         return client.getIntegerReply();
@@ -1779,7 +1779,7 @@ public class Jedis implements JedisCommands {
      * @param end
      * @return Integer reply, specifically the number of elements removed.
      */
-    public Integer zremrangeByScore(String key, double start, double end) {
+    public Long zremrangeByScore(String key, double start, double end) {
         runChecks();
         client.zremrangeByScore(key, start, end);
         return client.getIntegerReply();
@@ -1855,7 +1855,7 @@ public class Jedis implements JedisCommands {
      * 
      * @return Integer reply, specifically an UNIX time stamp.
      */
-    public Integer lastsave() {
+    public Long lastsave() {
         client.lastsave();
         return client.getIntegerReply();
     }
@@ -1985,6 +1985,7 @@ public class Jedis implements JedisCommands {
     public void sync() {
         client.sync();
     }
+
 
     public String echo(String string) {
         client.echo(string);

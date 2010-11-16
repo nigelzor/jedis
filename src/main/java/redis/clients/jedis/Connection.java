@@ -119,9 +119,9 @@ public class Connection {
         return (String) protocol.read(inputStream);
     }
 
-    public Integer getIntegerReply() {
+    public Long getIntegerReply() {
         pipelinedCommands--;
-        return (Integer) protocol.read(inputStream);
+        return (Long) protocol.read(inputStream);
     }
 
     @SuppressWarnings("unchecked")

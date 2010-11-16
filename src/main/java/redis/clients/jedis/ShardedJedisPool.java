@@ -36,7 +36,7 @@ public class ShardedJedisPool extends FixedResourcePool<ShardedJedis> {
     protected ShardedJedis createResource() {
         ShardedJedis jedis = new ShardedJedis(shards, algo, keyTagPattern);
         boolean done = false;
-        while (!done) {
+        while (!done && !finishing) {
             try {
                 for (JedisShardInfo shard : jedis.getAllShards()) {
                     if (!shard.getResource().isConnected()) {

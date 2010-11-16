@@ -1,6 +1,7 @@
 package redis.clients.jedis.tests;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Assert;
@@ -91,5 +92,24 @@ public class JedisPoolTest extends Assert {
         Jedis newJedis = pool.getResource(200);
         newJedis.auth("foobared");
         newJedis.incr("foo");
+    }
+    
+    private int getOpenPort() throws IOException {
+    	ServerSocket socket = null;
+    	try {
+	    	socket = new ServerSocket(0);
+	    	return socket.getLocalPort();
+    	} finally {
+    		if (socket != null) socket.close();
+    	}
+    }
+    
+    @Test(timeout=2000)
+    public void checkPoolShutdownWithoutAvailableRedis() throws TimeoutException, IOException {
+        JedisPool pool = new JedisPool("127.0.0.1", getOpenPort(), 2000);
+        pool.setTimeBetweenValidation(1000);
+        pool.setResourcesNumber(10);
+        pool.init();
+        pool.destroy();
     }
 }

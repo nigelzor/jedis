@@ -140,7 +140,7 @@ public class SortingCommandsTest extends JedisCommandTestBase {
 	jedis.lpush("foo", "2");
 	jedis.lpush("foo", "10");
 
-	int result = jedis.sort("foo", "result");
+	long result = jedis.sort("foo", "result");
 
 	List<String> expected = new ArrayList<String>();
 	expected.add("1");

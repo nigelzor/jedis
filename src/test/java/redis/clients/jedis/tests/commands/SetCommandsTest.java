@@ -8,7 +8,7 @@ import org.junit.Test;
 public class SetCommandsTest extends JedisCommandTestBase {
     @Test
     public void sadd() {
-	int status = jedis.sadd("foo", "a");
+	long status = jedis.sadd("foo", "a");
 	assertEquals(1, status);
 
 	status = jedis.sadd("foo", "a");
@@ -34,7 +34,7 @@ public class SetCommandsTest extends JedisCommandTestBase {
 	jedis.sadd("foo", "a");
 	jedis.sadd("foo", "b");
 
-	int status = jedis.srem("foo", "a");
+	long status = jedis.srem("foo", "a");
 
 	Set<String> expected = new LinkedHashSet<String>();
 	expected.add("b");
@@ -68,7 +68,7 @@ public class SetCommandsTest extends JedisCommandTestBase {
 
 	jedis.sadd("bar", "c");
 
-	int status = jedis.smove("foo", "bar", "a");
+	long status = jedis.smove("foo", "bar", "a");
 
 	Set<String> expectedSrc = new LinkedHashSet<String>();
 	expectedSrc.add("b");
@@ -90,7 +90,7 @@ public class SetCommandsTest extends JedisCommandTestBase {
 	jedis.sadd("foo", "a");
 	jedis.sadd("foo", "b");
 
-	int card = jedis.scard("foo");
+	long card = jedis.scard("foo");
 
 	assertEquals(2, card);
 
@@ -103,7 +103,7 @@ public class SetCommandsTest extends JedisCommandTestBase {
 	jedis.sadd("foo", "a");
 	jedis.sadd("foo", "b");
 
-	int status = jedis.sismember("foo", "a");
+	long status = jedis.sismember("foo", "a");
 	assertEquals(1, status);
 
 	status = jedis.sismember("foo", "c");
@@ -136,7 +136,7 @@ public class SetCommandsTest extends JedisCommandTestBase {
 	Set<String> expected = new LinkedHashSet<String>();
 	expected.add("b");
 
-	int status = jedis.sinterstore("car", "foo", "bar");
+	long status = jedis.sinterstore("car", "foo", "bar");
 	assertEquals(1, status);
 
 	assertEquals(expected, jedis.smembers("car"));
@@ -172,7 +172,7 @@ public class SetCommandsTest extends JedisCommandTestBase {
 	expected.add("b");
 	expected.add("c");
 
-	int status = jedis.sunionstore("car", "foo", "bar");
+	long status = jedis.sunionstore("car", "foo", "bar");
 	assertEquals(3, status);
 
 	assertEquals(expected, jedis.smembers("car"));
@@ -214,7 +214,7 @@ public class SetCommandsTest extends JedisCommandTestBase {
 	expected.add("d");
 	expected.add("a");
 
-	int status = jedis.sdiffstore("tar", "foo", "bar", "car");
+	long status = jedis.sdiffstore("tar", "foo", "bar", "car");
 	assertEquals(2, status);
 	assertEquals(expected, jedis.smembers("car"));
     }

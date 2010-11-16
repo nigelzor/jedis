@@ -11,33 +11,33 @@ public interface JedisCommands {
 
     String get(String key);
 
-    Integer exists(String key);
+    Long exists(String key);
 
     String type(String key);
 
-    Integer expire(String key, int seconds);
+    Long expire(String key, int seconds);
 
-    Integer expireAt(String key, long unixTime);
+    Long expireAt(String key, long unixTime);
 
-    Integer ttl(String key);
+    Long ttl(String key);
 
     String getSet(String key, String value);
 
-    Integer setnx(String key, String value);
+    Long setnx(String key, String value);
 
-    Integer decrBy(String key, int integer);
+    Long decrBy(String key, int integer);
 
-    Integer decr(String key);
+    Long decr(String key);
 
-    Integer incrBy(String key, int integer);
+    Long incrBy(String key, int integer);
 
-    Integer incr(String key);
+    Long incr(String key);
 
     String rpush(String key, String string);
 
     String lpush(String key, String string);
 
-    Integer llen(String key);
+    Long llen(String key);
 
     List<String> lrange(String key, int start, int end);
 
@@ -47,31 +47,31 @@ public interface JedisCommands {
 
     String lset(String key, int index, String value);
 
-    Integer lrem(String key, int count, String value);
+    Long lrem(String key, int count, String value);
 
     String lpop(String key);
 
     String rpop(String key);
 
-    Integer sadd(String key, String member);
+    Long sadd(String key, String member);
 
     Set<String> smembers(String key);
 
-    Integer srem(String key, String member);
+    Long srem(String key, String member);
 
     String spop(String key);
 
-    Integer scard(String key);
+    Long scard(String key);
 
-    Integer sismember(String key, String member);
+    Long sismember(String key, String member);
 
     String srandmember(String key);
 
-    Integer zadd(String key, double score, String member);
+    Long zadd(String key, double score, String member);
 
     Set<String> zrange(String key, int start, int end);
 
-    Integer zrem(String key, String member);
+    Long zrem(String key, String member);
 
     Double zincrby(String key, double score, String member);
 
@@ -81,7 +81,7 @@ public interface JedisCommands {
 
     Set<Tuple> zrevrangeWithScores(String key, int start, int end);
 
-    Integer zcard(String key);
+    Long zcard(String key);
 
     Double zscore(String key, String member);
 
@@ -89,7 +89,7 @@ public interface JedisCommands {
 
     List<String> sort(String key, SortingParams sortingParameters);
 
-    Integer zcount(String key, double min, double max);
+    Long zcount(String key, double min, double max);
 
     Set<String> zrangeByScore(String key, double min, double max);
 
@@ -101,5 +101,5 @@ public interface JedisCommands {
     Set<Tuple> zrangeByScoreWithScores(String key, double min,
             double max, int offset, int count);
 
-    Integer zremrangeByScore(String key, double start, double end);
+    Long zremrangeByScore(String key, double start, double end);
 }
