@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,6 +29,20 @@ public class Jedis extends BinaryJedis implements JedisCommands {
         super(shardInfo);
     }
 
+    private static <T> Set<T> setOrNull(List<T> elements) {
+    	if (elements == null) {
+    		return null;
+    	}
+    	return new LinkedHashSet<T>(elements);
+    }
+    
+    private static Double doubleOrNull(String value) {
+    	if (value == null) {
+    		return null;
+    	}
+    	return Double.valueOf(value);
+    }
+    
     @Override
 	public String ping() {
         runChecks();
@@ -177,9 +190,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
     public Set<String> keys(final String pattern) {
         runChecks();
         client.keys(pattern);
-        final HashSet<String> keySet = new HashSet<String>(client
-                .getMultiBulkReply());
-        return keySet;
+        return setOrNull(client.getMultiBulkReply());
     }
 
     /**
@@ -833,8 +844,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
     public Set<String> hkeys(final String key) {
         runChecks();
         client.hkeys(key);
-        final List<String> lresult = client.getMultiBulkReply();
-        return new HashSet<String>(lresult);
+        return setOrNull(client.getMultiBulkReply());
     }
 
     /**
@@ -848,8 +858,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
     public List<String> hvals(final String key) {
         runChecks();
         client.hvals(key);
-        final List<String> lresult = client.getMultiBulkReply();
-        return lresult;
+        return client.getMultiBulkReply();
     }
 
     /**
@@ -864,12 +873,14 @@ public class Jedis extends BinaryJedis implements JedisCommands {
         runChecks();
         client.hgetAll(key);
         final List<String> flatHash = client.getMultiBulkReply();
+        if (flatHash == null) {
+        	return null;
+        }
         final Map<String, String> hash = new HashMap<String, String>();
         final Iterator<String> iterator = flatHash.iterator();
         while (iterator.hasNext()) {
             hash.put(iterator.next(), iterator.next());
         }
-
         return hash;
     }
 
@@ -1184,8 +1195,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
     public Set<String> smembers(final String key) {
         runChecks();
         client.smembers(key);
-        final List<String> members = client.getMultiBulkReply();
-        return new LinkedHashSet<String>(members);
+        return setOrNull(client.getMultiBulkReply());
     }
 
     /**
@@ -1308,8 +1318,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
     public Set<String> sinter(final String... keys) {
         runChecks();
         client.sinter(keys);
-        final List<String> members = client.getMultiBulkReply();
-        return new LinkedHashSet<String>(members);
+        return setOrNull(client.getMultiBulkReply());
     }
 
     /**
@@ -1348,8 +1357,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
     public Set<String> sunion(final String... keys) {
         runChecks();
         client.sunion(keys);
-        final List<String> members = client.getMultiBulkReply();
-        return new LinkedHashSet<String>(members);
+        return setOrNull(client.getMultiBulkReply());
     }
 
     /**
@@ -1396,8 +1404,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
     public Set<String> sdiff(final String... keys) {
         runChecks();
         client.sdiff(keys);
-        final List<String> members = client.getMultiBulkReply();
-        return new LinkedHashSet<String>(members);
+        return setOrNull(client.getMultiBulkReply());
     }
 
     /**
@@ -1463,8 +1470,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
     public Set<String> zrange(final String key, final int start, final int end) {
         runChecks();
         client.zrange(key, start, end);
-        final List<String> members = client.getMultiBulkReply();
-        return new LinkedHashSet<String>(members);
+        return setOrNull(client.getMultiBulkReply());
     }
 
     /**
@@ -1516,8 +1522,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
             final String member) {
         runChecks();
         client.zincrby(key, score, member);
-        String newscore = client.getBulkReply();
-        return Double.valueOf(newscore);
+        return doubleOrNull(client.getBulkReply());
     }
 
     /**
@@ -1576,24 +1581,21 @@ public class Jedis extends BinaryJedis implements JedisCommands {
             final int end) {
         runChecks();
         client.zrevrange(key, start, end);
-        final List<String> members = client.getMultiBulkReply();
-        return new LinkedHashSet<String>(members);
+        return setOrNull(client.getMultiBulkReply());
     }
 
     public Set<Tuple> zrangeWithScores(final String key, final int start,
             final int end) {
         runChecks();
         client.zrangeWithScores(key, start, end);
-        Set<Tuple> set = getTupledSet();
-        return set;
+        return getTupledSet();
     }
 
     public Set<Tuple> zrevrangeWithScores(final String key, final int start,
             final int end) {
         runChecks();
         client.zrevrangeWithScores(key, start, end);
-        Set<Tuple> set = getTupledSet();
-        return set;
+        return getTupledSet();
     }
 
     /**
@@ -1625,8 +1627,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
     public Double zscore(final String key, final String member) {
         runChecks();
         client.zscore(key, member);
-        final String score = client.getBulkReply();
-        return (score != null ? new Double(score) : null);
+        return doubleOrNull(client.getBulkReply());
     }
 
     @Override
@@ -2123,14 +2124,14 @@ public class Jedis extends BinaryJedis implements JedisCommands {
             final double max) {
         runChecks();
         client.zrangeByScore(key, min, max);
-        return new LinkedHashSet<String>(client.getMultiBulkReply());
+        return setOrNull(client.getMultiBulkReply());
     }
 
     public Set<String> zrangeByScore(final String key, final String min,
             final String max) {
         runChecks();
         client.zrangeByScore(key, min, max);
-        return new LinkedHashSet<String>(client.getMultiBulkReply());
+        return setOrNull(client.getMultiBulkReply());
     }
 
     /**
@@ -2193,7 +2194,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
             final double max, final int offset, final int count) {
         runChecks();
         client.zrangeByScore(key, min, max, offset, count);
-        return new LinkedHashSet<String>(client.getMultiBulkReply());
+        return setOrNull(client.getMultiBulkReply());
     }
 
     /**
@@ -2256,8 +2257,7 @@ public class Jedis extends BinaryJedis implements JedisCommands {
             final double min, final double max) {
         runChecks();
         client.zrangeByScoreWithScores(key, min, max);
-        Set<Tuple> set = getTupledSet();
-        return set;
+        return getTupledSet();
     }
 
     /**
@@ -2321,19 +2321,19 @@ public class Jedis extends BinaryJedis implements JedisCommands {
             final int count) {
         runChecks();
         client.zrangeByScoreWithScores(key, min, max, offset, count);
-        Set<Tuple> set = getTupledSet();
-        return set;
+        return getTupledSet();
     }
 
     private Set<Tuple> getTupledSet() {
         runChecks();
         List<String> membersWithScores = client.getMultiBulkReply();
+        if (membersWithScores == null) {
+        	return null;
+        }
         Set<Tuple> set = new LinkedHashSet<Tuple>();
         Iterator<String> iterator = membersWithScores.iterator();
         while (iterator.hasNext()) {
-            set
-                    .add(new Tuple(iterator.next(), Double.valueOf(iterator
-                            .next())));
+            set.add(new Tuple(iterator.next(), Double.valueOf(iterator.next())));
         }
         return set;
     }
