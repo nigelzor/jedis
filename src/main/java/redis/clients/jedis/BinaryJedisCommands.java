@@ -1,11 +1,7 @@
 package redis.clients.jedis;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import redis.clients.jedis.BinaryClient.LIST_POSITION;
 
 /**
  * Common interface for sharded and non-sharded BinaryJedis
@@ -29,8 +25,6 @@ public interface BinaryJedisCommands {
 
     Long setnx(byte[] key, byte[] value);
 
-    String setex(byte[] key, int seconds, byte[] value);
-
     Long decrBy(byte[] key, int integer);
 
     Long decr(byte[] key);
@@ -39,37 +33,9 @@ public interface BinaryJedisCommands {
 
     Long incr(byte[] key);
 
-    Long append(byte[] key, byte[] value);
+    String rpush(byte[] key, byte[] string);
 
-    byte[] substr(byte[] key, int start, int end);
-
-    Long hset(byte[] key, byte[] field, byte[] value);
-
-    byte[] hget(byte[] key, byte[] field);
-
-    Long hsetnx(byte[] key, byte[] field, byte[] value);
-
-    String hmset(byte[] key, Map<byte[], byte[]> hash);
-
-    List<byte[]> hmget(byte[] key, byte[]... fields);
-
-    Long hincrBy(byte[] key, byte[] field, int value);
-
-    Long hexists(byte[] key, byte[] field);
-
-    Long hdel(byte[] key, byte[] field);
-
-    Long hlen(byte[] key);
-
-    Set<byte[]> hkeys(byte[] key);
-
-    Collection<byte[]> hvals(byte[] key);
-
-    Map<byte[], byte[]> hgetAll(byte[] key);
-
-    Long rpush(byte[] key, byte[] string);
-
-    Long lpush(byte[] key, byte[] string);
+    String lpush(byte[] key, byte[] string);
 
     Long llen(byte[] key);
 
@@ -109,10 +75,6 @@ public interface BinaryJedisCommands {
 
     Double zincrby(byte[] key, double score, byte[] member);
 
-    Long zrank(byte[] key, byte[] member);
-
-    Long zrevrank(byte[] key, byte[] member);
-
     Set<byte[]> zrevrange(byte[] key, int start, int end);
 
     Set<Tuple> zrangeWithScores(byte[] key, int start, int end);
@@ -147,13 +109,6 @@ public interface BinaryJedisCommands {
             int offset,
             int count);
 
-    Long zremrangeByRank(byte[] key, int start, int end);
-
     Long zremrangeByScore(byte[] key, double start, double end);
 
-    Long linsert(
-    		byte[] key,
-    		LIST_POSITION where,
-    		byte[] pivot,
-    		byte[] value);
 }

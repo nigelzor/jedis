@@ -2,9 +2,6 @@ package redis.clients.jedis;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import redis.clients.jedis.BinaryClient.LIST_POSITION;
 
 public abstract class ShardedJedisPipeline {
     private BinaryShardedJedis jedis;
@@ -80,12 +77,6 @@ public abstract class ShardedJedisPipeline {
         results.add(new FutureResult(c));
     }
 
-    protected void setex(String key, int seconds, String value) {
-        Client c = jedis.getShard(key).getClient();
-        c.setex(key, seconds, value);
-        results.add(new FutureResult(c));
-    }
-
     protected void decrBy(String key, int integer) {
         Client c = jedis.getShard(key).getClient();
         c.decrBy(key, integer);
@@ -107,90 +98,6 @@ public abstract class ShardedJedisPipeline {
     protected void incr(String key) {
         Client c = jedis.getShard(key).getClient();
         c.incr(key);
-        results.add(new FutureResult(c));
-    }
-
-    protected void append(String key, String value) {
-        Client c = jedis.getShard(key).getClient();
-        c.append(key, value);
-        results.add(new FutureResult(c));
-    }
-
-    protected void substr(String key, int start, int end) {
-        Client c = jedis.getShard(key).getClient();
-        c.substr(key, start, end);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hset(String key, String field, String value) {
-        Client c = jedis.getShard(key).getClient();
-        c.hset(key, field, value);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hget(String key, String field) {
-        Client c = jedis.getShard(key).getClient();
-        c.hget(key, field);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hsetnx(String key, String field, String value) {
-        Client c = jedis.getShard(key).getClient();
-        c.hsetnx(key, field, value);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hmset(String key, Map<String, String> hash) {
-        Client c = jedis.getShard(key).getClient();
-        c.hmset(key, hash);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hmget(String key, String... fields) {
-        Client c = jedis.getShard(key).getClient();
-        c.hmget(key, fields);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hincrBy(String key, String field, int value) {
-        Client c = jedis.getShard(key).getClient();
-        c.hincrBy(key, field, value);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hexists(String key, String field) {
-        Client c = jedis.getShard(key).getClient();
-        c.hexists(key, field);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hdel(String key, String field) {
-        Client c = jedis.getShard(key).getClient();
-        c.hdel(key, field);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hlen(String key) {
-        Client c = jedis.getShard(key).getClient();
-        c.hlen(key);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hkeys(String key) {
-        Client c = jedis.getShard(key).getClient();
-        c.hkeys(key);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hvals(String key) {
-        Client c = jedis.getShard(key).getClient();
-        c.hvals(key);
-        results.add(new FutureResult(c));
-    }
-
-    protected void hgetAll(String key) {
-        Client c = jedis.getShard(key).getClient();
-        c.hgetAll(key);
         results.add(new FutureResult(c));
     }
 
@@ -320,18 +227,6 @@ public abstract class ShardedJedisPipeline {
         results.add(new FutureResult(c));
     }
 
-    protected void zrank(String key, String member) {
-        Client c = jedis.getShard(key).getClient();
-        c.zrank(key, member);
-        results.add(new FutureResult(c));
-    }
-
-    protected void zrevrank(String key, String member) {
-        Client c = jedis.getShard(key).getClient();
-        c.zrevrank(key, member);
-        results.add(new FutureResult(c));
-    }
-
     protected void zrevrange(String key, int start, int end) {
         Client c = jedis.getShard(key).getClient();
         c.zrevrange(key, start, end);
@@ -406,22 +301,9 @@ public abstract class ShardedJedisPipeline {
         results.add(new FutureResult(c));
     }
 
-    protected void zremrangeByRank(String key, int start, int end) {
-        Client c = jedis.getShard(key).getClient();
-        c.zremrangeByRank(key, start, end);
-        results.add(new FutureResult(c));
-    }
-
     protected void zremrangeByScore(String key, double start, double end) {
         Client c = jedis.getShard(key).getClient();
         c.zremrangeByScore(key, start, end);
-        results.add(new FutureResult(c));
-    }
-
-    protected void linsert(String key, LIST_POSITION where, String pivot,
-            String value) {
-        Client c = jedis.getShard(key).getClient();
-        c.linsert(key, where, pivot, value);
         results.add(new FutureResult(c));
     }
 

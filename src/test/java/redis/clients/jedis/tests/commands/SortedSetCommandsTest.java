@@ -6,7 +6,6 @@ import java.util.Set;
 import org.junit.Test;
 
 import redis.clients.jedis.Tuple;
-import redis.clients.jedis.ZParams;
 import redis.clients.util.SafeEncoder;
 
 public class SortedSetCommandsTest extends JedisCommandTestBase {
@@ -181,56 +180,6 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
 
         assertEquals(3d, bscore, 0);
         assertEquals(bexpected, jedis.zrange(bfoo, 0, 100));
-
-    }
-
-    @Test
-    public void zrank() {
-        jedis.zadd("foo", 1d, "a");
-        jedis.zadd("foo", 2d, "b");
-
-        long rank = jedis.zrank("foo", "a");
-        assertEquals(0, rank);
-
-        rank = jedis.zrank("foo", "b");
-        assertEquals(1, rank);
-
-        assertNull(jedis.zrank("car", "b"));
-
-        // Binary
-        jedis.zadd(bfoo, 1d, ba);
-        jedis.zadd(bfoo, 2d, bb);
-
-        long brank = jedis.zrank(bfoo, ba);
-        assertEquals(0, brank);
-
-        brank = jedis.zrank(bfoo, bb);
-        assertEquals(1, brank);
-
-        assertNull(jedis.zrank(bcar, bb));
-
-    }
-
-    @Test
-    public void zrevrank() {
-        jedis.zadd("foo", 1d, "a");
-        jedis.zadd("foo", 2d, "b");
-
-        long rank = jedis.zrevrank("foo", "a");
-        assertEquals(1, rank);
-
-        rank = jedis.zrevrank("foo", "b");
-        assertEquals(0, rank);
-
-        // Binary
-        jedis.zadd(bfoo, 1d, ba);
-        jedis.zadd(bfoo, 2d, bb);
-
-        long brank = jedis.zrevrank(bfoo, ba);
-        assertEquals(1, brank);
-
-        brank = jedis.zrevrank(bfoo, bb);
-        assertEquals(0, brank);
 
     }
 
@@ -510,41 +459,6 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
     }
 
     @Test
-    public void zremrangeByRank() {
-        jedis.zadd("foo", 1d, "a");
-        jedis.zadd("foo", 10d, "b");
-        jedis.zadd("foo", 0.1d, "c");
-        jedis.zadd("foo", 2d, "a");
-
-        long result = jedis.zremrangeByRank("foo", 0, 0);
-
-        assertEquals(1, result);
-
-        Set<String> expected = new LinkedHashSet<String>();
-        expected.add("a");
-        expected.add("b");
-
-        assertEquals(expected, jedis.zrange("foo", 0, 100));
-
-        // Binary
-        jedis.zadd(bfoo, 1d, ba);
-        jedis.zadd(bfoo, 10d, bb);
-        jedis.zadd(bfoo, 0.1d, bc);
-        jedis.zadd(bfoo, 2d, ba);
-
-        long bresult = jedis.zremrangeByRank(bfoo, 0, 0);
-
-        assertEquals(1, bresult);
-
-        Set<byte[]> bexpected = new LinkedHashSet<byte[]>();
-        bexpected.add(ba);
-        bexpected.add(bb);
-
-        assertEquals(bexpected, jedis.zrange(bfoo, 0, 100));
-
-    }
-
-    @Test
     public void zremrangeByScore() {
         jedis.zadd("foo", 1d, "a");
         jedis.zadd("foo", 10d, "b");
@@ -574,151 +488,5 @@ public class SortedSetCommandsTest extends JedisCommandTestBase {
         bexpected.add(bb);
 
         assertEquals(bexpected, jedis.zrange(bfoo, 0, 100));
-    }
-
-    @Test
-    public void zunionstore() {
-        jedis.zadd("foo", 1, "a");
-        jedis.zadd("foo", 2, "b");
-        jedis.zadd("bar", 2, "a");
-        jedis.zadd("bar", 2, "b");
-
-        long result = jedis.zunionstore("dst", "foo", "bar");
-
-        assertEquals(2, result);
-
-        Set<Tuple> expected = new LinkedHashSet<Tuple>();
-        expected.add(new Tuple("b", new Double(4)));
-        expected.add(new Tuple("a", new Double(3)));
-
-        assertEquals(expected, jedis.zrangeWithScores("dst", 0, 100));
-
-        // Binary
-        jedis.zadd(bfoo, 1, ba);
-        jedis.zadd(bfoo, 2, bb);
-        jedis.zadd(bbar, 2, ba);
-        jedis.zadd(bbar, 2, bb);
-
-        long bresult = jedis.zunionstore(SafeEncoder.encode("dst"), bfoo, bbar);
-
-        assertEquals(2, bresult);
-
-        Set<Tuple> bexpected = new LinkedHashSet<Tuple>();
-        bexpected.add(new Tuple(bb, new Double(4)));
-        bexpected.add(new Tuple(ba, new Double(3)));
-
-        assertEquals(bexpected, jedis.zrangeWithScores(SafeEncoder
-                .encode("dst"), 0, 100));
-    }
-
-    @Test
-    public void zunionstoreParams() {
-        jedis.zadd("foo", 1, "a");
-        jedis.zadd("foo", 2, "b");
-        jedis.zadd("bar", 2, "a");
-        jedis.zadd("bar", 2, "b");
-
-        ZParams params = new ZParams();
-        params.weights(2, 2);
-        params.aggregate(ZParams.Aggregate.SUM);
-        long result = jedis.zunionstore("dst", params, "foo", "bar");
-
-        assertEquals(2, result);
-
-        Set<Tuple> expected = new LinkedHashSet<Tuple>();
-        expected.add(new Tuple("b", new Double(8)));
-        expected.add(new Tuple("a", new Double(6)));
-
-        assertEquals(expected, jedis.zrangeWithScores("dst", 0, 100));
-
-        // Binary
-        jedis.zadd(bfoo, 1, ba);
-        jedis.zadd(bfoo, 2, bb);
-        jedis.zadd(bbar, 2, ba);
-        jedis.zadd(bbar, 2, bb);
-
-        ZParams bparams = new ZParams();
-        bparams.weights(2, 2);
-        bparams.aggregate(ZParams.Aggregate.SUM);
-        long bresult = jedis.zunionstore(SafeEncoder.encode("dst"), bparams,
-                bfoo, bbar);
-
-        assertEquals(2, bresult);
-
-        Set<Tuple> bexpected = new LinkedHashSet<Tuple>();
-        bexpected.add(new Tuple(bb, new Double(8)));
-        bexpected.add(new Tuple(ba, new Double(6)));
-
-        assertEquals(bexpected, jedis.zrangeWithScores(SafeEncoder
-                .encode("dst"), 0, 100));
-    }
-
-    @Test
-    public void zinterstore() {
-        jedis.zadd("foo", 1, "a");
-        jedis.zadd("foo", 2, "b");
-        jedis.zadd("bar", 2, "a");
-
-        long result = jedis.zinterstore("dst", "foo", "bar");
-
-        assertEquals(1, result);
-
-        Set<Tuple> expected = new LinkedHashSet<Tuple>();
-        expected.add(new Tuple("a", new Double(3)));
-
-        assertEquals(expected, jedis.zrangeWithScores("dst", 0, 100));
-
-        // Binary
-        jedis.zadd(bfoo, 1, ba);
-        jedis.zadd(bfoo, 2, bb);
-        jedis.zadd(bbar, 2, ba);
-
-        long bresult = jedis.zinterstore(SafeEncoder.encode("dst"), bfoo, bbar);
-
-        assertEquals(1, bresult);
-
-        Set<Tuple> bexpected = new LinkedHashSet<Tuple>();
-        bexpected.add(new Tuple(ba, new Double(3)));
-
-        assertEquals(bexpected, jedis.zrangeWithScores(SafeEncoder
-                .encode("dst"), 0, 100));
-    }
-
-    @Test
-    public void zintertoreParams() {
-        jedis.zadd("foo", 1, "a");
-        jedis.zadd("foo", 2, "b");
-        jedis.zadd("bar", 2, "a");
-
-        ZParams params = new ZParams();
-        params.weights(2, 2);
-        params.aggregate(ZParams.Aggregate.SUM);
-        long result = jedis.zinterstore("dst", params, "foo", "bar");
-
-        assertEquals(1, result);
-
-        Set<Tuple> expected = new LinkedHashSet<Tuple>();
-        expected.add(new Tuple("a", new Double(6)));
-
-        assertEquals(expected, jedis.zrangeWithScores("dst", 0, 100));
-
-        // Binary
-        jedis.zadd(bfoo, 1, ba);
-        jedis.zadd(bfoo, 2, bb);
-        jedis.zadd(bbar, 2, ba);
-
-        ZParams bparams = new ZParams();
-        bparams.weights(2, 2);
-        bparams.aggregate(ZParams.Aggregate.SUM);
-        long bresult = jedis.zinterstore(SafeEncoder.encode("dst"), bparams,
-                bfoo, bbar);
-
-        assertEquals(1, bresult);
-
-        Set<Tuple> bexpected = new LinkedHashSet<Tuple>();
-        bexpected.add(new Tuple(ba, new Double(6)));
-
-        assertEquals(bexpected, jedis.zrangeWithScores(SafeEncoder
-                .encode("dst"), 0, 100));
     }
 }

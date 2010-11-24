@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import redis.clients.jedis.JedisException;
-
 public class StringValuesCommandsTest extends JedisCommandTestBase {
     @Test
     public void setAndGet() {
@@ -67,14 +65,6 @@ public class StringValuesCommandsTest extends JedisCommandTestBase {
     }
 
     @Test
-    public void setex() {
-	String status = jedis.setex("foo", 20, "bar");
-	assertEquals("OK", status);
-	long ttl = jedis.ttl("foo");
-	assertTrue(ttl > 0 && ttl <= 20);
-    }
-
-    @Test
     public void mset() {
 	String status = jedis.mset("foo", "bar", "bar", "foo");
 	assertEquals("OK", status);
@@ -95,10 +85,11 @@ public class StringValuesCommandsTest extends JedisCommandTestBase {
 	assertEquals("foo", jedis.get("bar"));
     }
 
-    @Test(expected = JedisException.class)
+    @Test
     public void incrWrongValue() {
 	jedis.set("foo", "bar");
-	jedis.incr("foo");
+	long value = jedis.incr("foo");
+	assertEquals(1, value);
     }
 
     @Test
@@ -109,10 +100,11 @@ public class StringValuesCommandsTest extends JedisCommandTestBase {
 	assertEquals(2, value);
     }
 
-    @Test(expected = JedisException.class)
+    @Test
     public void incrByWrongValue() {
 	jedis.set("foo", "bar");
-	jedis.incrBy("foo", 2);
+	long value = jedis.incrBy("foo", 2);
+	assertEquals(2, value);
     }
 
     @Test
@@ -123,10 +115,11 @@ public class StringValuesCommandsTest extends JedisCommandTestBase {
 	assertEquals(4, value);
     }
 
-    @Test(expected = JedisException.class)
+    @Test
     public void decrWrongValue() {
 	jedis.set("foo", "bar");
-	jedis.decr("foo");
+	long value = jedis.decr("foo");
+	assertEquals(-1, value);
     }
 
     @Test
@@ -137,10 +130,11 @@ public class StringValuesCommandsTest extends JedisCommandTestBase {
 	assertEquals(-2, value);
     }
 
-    @Test(expected = JedisException.class)
+    @Test
     public void decrByWrongValue() {
 	jedis.set("foo", "bar");
-	jedis.decrBy("foo", 2);
+	long value = jedis.decrBy("foo", 2);
+	assertEquals(-2, value);
     }
 
     @Test
@@ -149,31 +143,6 @@ public class StringValuesCommandsTest extends JedisCommandTestBase {
 	assertEquals(-2, value);
 	value = jedis.decrBy("foo", 2);
 	assertEquals(-4, value);
-    }
-
-    @Test
-    public void append() {
-	long value = jedis.append("foo", "bar");
-	assertEquals(3, value);
-	assertEquals("bar", jedis.get("foo"));
-	value = jedis.append("foo", "bar");
-	assertEquals(6, value);
-	assertEquals("barbar", jedis.get("foo"));
-    }
-
-    @Test
-    public void substr() {
-	jedis.set("s", "This is a string");
-	assertEquals("This", jedis.substr("s", 0, 3));
-	assertEquals("ing", jedis.substr("s", -3, -1));
-	assertEquals("This is a string", jedis.substr("s", 0, -1));
-	assertEquals(" string", jedis.substr("s", 9, 100000));
-    }
-
-    @Test
-    public void strlen() {
-	jedis.set("s", "This is a string");
-	assertEquals("This is a string".length(), jedis.strlen("s").intValue());
     }
 	
 	@Test

@@ -7,7 +7,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import redis.clients.jedis.JedisException;
 import redis.clients.jedis.Protocol.Keyword;
 
 public class BinaryValuesCommandsTest extends JedisCommandTestBase {
@@ -85,14 +84,6 @@ public class BinaryValuesCommandsTest extends JedisCommandTestBase {
     }
 
     @Test
-    public void setex() {
-        String status = jedis.setex(bfoo, 20, binaryValue);
-        assertEquals(Keyword.OK.name(), status);
-        long ttl = jedis.ttl(bfoo);
-        assertTrue(ttl > 0 && ttl <= 20);
-    }
-
-    @Test
     public void mset() {
         String status = jedis.mset(bfoo, binaryValue, bbar, bfoo);
         assertEquals(Keyword.OK.name(), status);
@@ -113,10 +104,11 @@ public class BinaryValuesCommandsTest extends JedisCommandTestBase {
         assertTrue(Arrays.equals(bfoo, jedis.get(bbar)));
     }
 
-    @Test(expected = JedisException.class)
+    @Test
     public void incrWrongValue() {
         jedis.set(bfoo, binaryValue);
-        jedis.incr(bfoo);
+        long value = jedis.incr(bfoo);
+        assertEquals(1, value);
     }
 
     @Test
@@ -127,10 +119,11 @@ public class BinaryValuesCommandsTest extends JedisCommandTestBase {
         assertEquals(2, value);
     }
 
-    @Test(expected = JedisException.class)
+    @Test
     public void incrByWrongValue() {
         jedis.set(bfoo, binaryValue);
-        jedis.incrBy(bfoo, 2);
+        long value = jedis.incrBy(bfoo, 2);
+        assertEquals(2, value);
     }
 
     @Test
@@ -141,10 +134,11 @@ public class BinaryValuesCommandsTest extends JedisCommandTestBase {
         assertEquals(4, value);
     }
 
-    @Test(expected = JedisException.class)
+    @Test
     public void decrWrongValue() {
         jedis.set(bfoo, binaryValue);
-        jedis.decr(bfoo);
+        long value = jedis.decr(bfoo);
+        assertEquals(-1, value);
     }
 
     @Test
@@ -155,10 +149,11 @@ public class BinaryValuesCommandsTest extends JedisCommandTestBase {
         assertEquals(-2, value);
     }
 
-    @Test(expected = JedisException.class)
+    @Test
     public void decrByWrongValue() {
         jedis.set(bfoo, binaryValue);
-        jedis.decrBy(bfoo, 2);
+        long value = jedis.decrBy(bfoo, 2);
+        assertEquals(-2, value);
     }
 
     @Test
@@ -167,48 +162,5 @@ public class BinaryValuesCommandsTest extends JedisCommandTestBase {
         assertEquals(-2, value);
         value = jedis.decrBy(bfoo, 2);
         assertEquals(-4, value);
-    }
-
-    @Test
-    public void append() {
-        byte[] first512 = new byte[512];
-        System.arraycopy(binaryValue, 0, first512, 0, 512);
-        long value = jedis.append(bfoo, first512);
-        assertEquals(512, value);
-        assertTrue(Arrays.equals(first512, jedis.get(bfoo)));
-
-        byte[] rest = new byte[binaryValue.length - 512];
-        System.arraycopy(binaryValue, 512, rest, 0, binaryValue.length - 512);
-        value = jedis.append(bfoo, rest);
-        assertEquals(binaryValue.length, value);
-
-        assertTrue(Arrays.equals(binaryValue, jedis.get(bfoo)));
-    }
-
-    @Test
-    public void substr() {
-        jedis.set(bfoo, binaryValue);
-
-        byte[] first512 = new byte[512];
-        System.arraycopy(binaryValue, 0, first512, 0, 512);
-        byte[] rfirst512 = jedis.substr(bfoo, 0, 511);
-        assertTrue(Arrays.equals(first512, rfirst512));
-
-        byte[] last512 = new byte[512];
-        System
-                .arraycopy(binaryValue, binaryValue.length - 512, last512, 0,
-                        512);
-        assertTrue(Arrays.equals(last512, jedis.substr(bfoo, -512, -1)));
-
-        assertTrue(Arrays.equals(binaryValue, jedis.substr(bfoo, 0, -1)));
-
-        assertTrue(Arrays.equals(last512, jedis.substr(bfoo,
-                binaryValue.length - 512, 100000)));
-    }
-
-    @Test
-    public void strlen() {
-        jedis.set(bfoo, binaryValue);
-        assertEquals(binaryValue.length, jedis.strlen(bfoo).intValue());
     }
 }

@@ -1,8 +1,6 @@
 package redis.clients.jedis;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,8 +25,6 @@ public interface JedisCommands {
 
     Long setnx(String key, String value);
 
-    String setex(String key, int seconds, String value);
-
     Long decrBy(String key, int integer);
 
     Long decr(String key);
@@ -37,37 +33,9 @@ public interface JedisCommands {
 
     Long incr(String key);
 
-    Long append(String key, String value);
+    String rpush(String key, String string);
 
-    String substr(String key, int start, int end);
-
-    Long hset(String key, String field, String value);
-
-    String hget(String key, String field);
-
-    Long hsetnx(String key, String field, String value);
-
-    String hmset(String key, Map<String, String> hash);
-
-    List<String> hmget(String key, String... fields);
-
-    Long hincrBy(String key, String field, int value);
-
-    Long hexists(String key, String field);
-
-    Long hdel(String key, String field);
-
-    Long hlen(String key);
-
-    Set<String> hkeys(String key);
-
-    Collection<String> hvals(String key);
-
-    Map<String, String> hgetAll(String key);
-
-    Long rpush(String key, String string);
-
-    Long lpush(String key, String string);
+    String lpush(String key, String string);
 
     Long llen(String key);
 
@@ -107,10 +75,6 @@ public interface JedisCommands {
 
     Double zincrby(String key, double score, String member);
 
-    Long zrank(String key, String member);
-
-    Long zrevrank(String key, String member);
-
     Set<String> zrevrange(String key, int start, int end);
 
     Set<Tuple> zrangeWithScores(String key, int start, int end);
@@ -137,10 +101,5 @@ public interface JedisCommands {
     Set<Tuple> zrangeByScoreWithScores(String key, double min,
             double max, int offset, int count);
 
-    Long zremrangeByRank(String key, int start, int end);
-
     Long zremrangeByScore(String key, double start, double end);
-
-    Long linsert(String key, Client.LIST_POSITION where, String pivot,
-                String value);
 }

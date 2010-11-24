@@ -1,13 +1,10 @@
 package redis.clients.jedis;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import redis.clients.jedis.BinaryClient.LIST_POSITION;
 import redis.clients.util.Hashing;
 import redis.clients.util.Sharded;
 
@@ -85,11 +82,6 @@ public class BinaryShardedJedis extends Sharded<Jedis, JedisShardInfo>
         return j.setnx(key, value);
     }
 
-    public String setex(byte[] key, int seconds, byte[] value) {
-        Jedis j = getShard(key);
-        return j.setex(key, seconds, value);
-    }
-
     public Long decrBy(byte[] key, int integer) {
         Jedis j = getShard(key);
         return j.decrBy(key, integer);
@@ -110,82 +102,12 @@ public class BinaryShardedJedis extends Sharded<Jedis, JedisShardInfo>
         return j.incr(key);
     }
 
-    public Long append(byte[] key, byte[] value) {
-        Jedis j = getShard(key);
-        return j.append(key, value);
-    }
-
-    public byte[] substr(byte[] key, int start, int end) {
-        Jedis j = getShard(key);
-        return j.substr(key, start, end);
-    }
-
-    public Long hset(byte[] key, byte[] field, byte[] value) {
-        Jedis j = getShard(key);
-        return j.hset(key, field, value);
-    }
-
-    public byte[] hget(byte[] key, byte[] field) {
-        Jedis j = getShard(key);
-        return j.hget(key, field);
-    }
-
-    public Long hsetnx(byte[] key, byte[] field, byte[] value) {
-        Jedis j = getShard(key);
-        return j.hsetnx(key, field, value);
-    }
-
-    public String hmset(byte[] key, Map<byte[], byte[]> hash) {
-        Jedis j = getShard(key);
-        return j.hmset(key, hash);
-    }
-
-    public List<byte[]> hmget(byte[] key, byte[]... fields) {
-        Jedis j = getShard(key);
-        return j.hmget(key, fields);
-    }
-
-    public Long hincrBy(byte[] key, byte[] field, int value) {
-        Jedis j = getShard(key);
-        return j.hincrBy(key, field, value);
-    }
-
-    public Long hexists(byte[] key, byte[] field) {
-        Jedis j = getShard(key);
-        return j.hexists(key, field);
-    }
-
-    public Long hdel(byte[] key, byte[] field) {
-        Jedis j = getShard(key);
-        return j.hdel(key, field);
-    }
-
-    public Long hlen(byte[] key) {
-        Jedis j = getShard(key);
-        return j.hlen(key);
-    }
-
-    public Set<byte[]> hkeys(byte[] key) {
-        Jedis j = getShard(key);
-        return j.hkeys(key);
-    }
-
-    public Collection<byte[]> hvals(byte[] key) {
-        Jedis j = getShard(key);
-        return j.hvals(key);
-    }
-
-    public Map<byte[], byte[]> hgetAll(byte[] key) {
-        Jedis j = getShard(key);
-        return j.hgetAll(key);
-    }
-
-    public Long rpush(byte[] key, byte[] string) {
+    public String rpush(byte[] key, byte[] string) {
         Jedis j = getShard(key);
         return j.rpush(key, string);
     }
 
-    public Long lpush(byte[] key, byte[] string) {
+    public String lpush(byte[] key, byte[] string) {
         Jedis j = getShard(key);
         return j.lpush(key, string);
     }
@@ -285,16 +207,6 @@ public class BinaryShardedJedis extends Sharded<Jedis, JedisShardInfo>
         return j.zincrby(key, score, member);
     }
 
-    public Long zrank(byte[] key, byte[] member) {
-        Jedis j = getShard(key);
-        return j.zrank(key, member);
-    }
-
-    public Long zrevrank(byte[] key, byte[] member) {
-        Jedis j = getShard(key);
-        return j.zrevrank(key, member);
-    }
-
     public Set<byte[]> zrevrange(byte[] key, int start, int end) {
         Jedis j = getShard(key);
         return j.zrevrange(key, start, end);
@@ -357,20 +269,9 @@ public class BinaryShardedJedis extends Sharded<Jedis, JedisShardInfo>
         return j.zrangeByScoreWithScores(key, min, max, offset, count);
     }
 
-    public Long zremrangeByRank(byte[] key, int start, int end) {
-        Jedis j = getShard(key);
-        return j.zremrangeByRank(key, start, end);
-    }
-
     public Long zremrangeByScore(byte[] key, double start, double end) {
         Jedis j = getShard(key);
         return j.zremrangeByScore(key, start, end);
-    }
-
-    public Long linsert(byte[] key, LIST_POSITION where, byte[] pivot,
-            byte[] value) {
-        Jedis j = getShard(key);
-        return j.linsert(key, where, pivot, value);
     }
 
     public List<Object> pipelined(ShardedJedisPipeline shardedJedisPipeline) {

@@ -1,13 +1,10 @@
 package redis.clients.jedis;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import redis.clients.jedis.BinaryClient.LIST_POSITION;
 import redis.clients.util.Hashing;
 
 public class ShardedJedis extends BinaryShardedJedis implements JedisCommands {
@@ -81,11 +78,6 @@ public class ShardedJedis extends BinaryShardedJedis implements JedisCommands {
         return j.setnx(key, value);
     }
 
-    public String setex(String key, int seconds, String value) {
-        Jedis j = getShard(key);
-        return j.setex(key, seconds, value);
-    }
-
     public Long decrBy(String key, int integer) {
         Jedis j = getShard(key);
         return j.decrBy(key, integer);
@@ -106,82 +98,12 @@ public class ShardedJedis extends BinaryShardedJedis implements JedisCommands {
         return j.incr(key);
     }
 
-    public Long append(String key, String value) {
-        Jedis j = getShard(key);
-        return j.append(key, value);
-    }
-
-    public String substr(String key, int start, int end) {
-        Jedis j = getShard(key);
-        return j.substr(key, start, end);
-    }
-
-    public Long hset(String key, String field, String value) {
-        Jedis j = getShard(key);
-        return j.hset(key, field, value);
-    }
-
-    public String hget(String key, String field) {
-        Jedis j = getShard(key);
-        return j.hget(key, field);
-    }
-
-    public Long hsetnx(String key, String field, String value) {
-        Jedis j = getShard(key);
-        return j.hsetnx(key, field, value);
-    }
-
-    public String hmset(String key, Map<String, String> hash) {
-        Jedis j = getShard(key);
-        return j.hmset(key, hash);
-    }
-
-    public List<String> hmget(String key, String... fields) {
-        Jedis j = getShard(key);
-        return j.hmget(key, fields);
-    }
-
-    public Long hincrBy(String key, String field, int value) {
-        Jedis j = getShard(key);
-        return j.hincrBy(key, field, value);
-    }
-
-    public Long hexists(String key, String field) {
-        Jedis j = getShard(key);
-        return j.hexists(key, field);
-    }
-
-    public Long hdel(String key, String field) {
-        Jedis j = getShard(key);
-        return j.hdel(key, field);
-    }
-
-    public Long hlen(String key) {
-        Jedis j = getShard(key);
-        return j.hlen(key);
-    }
-
-    public Set<String> hkeys(String key) {
-        Jedis j = getShard(key);
-        return j.hkeys(key);
-    }
-
-    public Collection<String> hvals(String key) {
-        Jedis j = getShard(key);
-        return j.hvals(key);
-    }
-
-    public Map<String, String> hgetAll(String key) {
-        Jedis j = getShard(key);
-        return j.hgetAll(key);
-    }
-
-    public Long rpush(String key, String string) {
+    public String rpush(String key, String string) {
         Jedis j = getShard(key);
         return j.rpush(key, string);
     }
 
-    public Long lpush(String key, String string) {
+    public String lpush(String key, String string) {
         Jedis j = getShard(key);
         return j.lpush(key, string);
     }
@@ -281,16 +203,6 @@ public class ShardedJedis extends BinaryShardedJedis implements JedisCommands {
         return j.zincrby(key, score, member);
     }
 
-    public Long zrank(String key, String member) {
-        Jedis j = getShard(key);
-        return j.zrank(key, member);
-    }
-
-    public Long zrevrank(String key, String member) {
-        Jedis j = getShard(key);
-        return j.zrevrank(key, member);
-    }
-
     public Set<String> zrevrange(String key, int start, int end) {
         Jedis j = getShard(key);
         return j.zrevrange(key, start, end);
@@ -353,19 +265,8 @@ public class ShardedJedis extends BinaryShardedJedis implements JedisCommands {
         return j.zrangeByScoreWithScores(key, min, max, offset, count);
     }
 
-    public Long zremrangeByRank(String key, int start, int end) {
-        Jedis j = getShard(key);
-        return j.zremrangeByRank(key, start, end);
-    }
-
     public Long zremrangeByScore(String key, double start, double end) {
         Jedis j = getShard(key);
         return j.zremrangeByScore(key, start, end);
-    }
-
-    public Long linsert(String key, LIST_POSITION where, String pivot,
-            String value) {
-        Jedis j = getShard(key);
-        return j.linsert(key, where, pivot, value);
     }
 }

@@ -1,9 +1,5 @@
 package redis.clients.jedis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import redis.clients.util.SafeEncoder;
 
 public class Client extends BinaryClient {
@@ -83,10 +79,6 @@ public class Client extends BinaryClient {
         setnx(SafeEncoder.encode(key), SafeEncoder.encode(value));
     }
 
-    public void setex(final String key, final int seconds, final String value) {
-        setex(SafeEncoder.encode(key), seconds, SafeEncoder.encode(value));
-    }
-
     public void mset(final String... keysvalues) {
         final byte[][] bkeysvalues = new byte[keysvalues.length][];
         for (int i = 0; i < keysvalues.length; i++) {
@@ -117,74 +109,6 @@ public class Client extends BinaryClient {
 
     public void incr(final String key) {
         incr(SafeEncoder.encode(key));
-    }
-
-    public void append(final String key, final String value) {
-        append(SafeEncoder.encode(key), SafeEncoder.encode(value));
-    }
-
-    public void substr(final String key, final int start, final int end) {
-        substr(SafeEncoder.encode(key), start, end);
-    }
-
-    public void hset(final String key, final String field, final String value) {
-        hset(SafeEncoder.encode(key), SafeEncoder.encode(field), SafeEncoder
-                .encode(value));
-    }
-
-    public void hget(final String key, final String field) {
-        hget(SafeEncoder.encode(key), SafeEncoder.encode(field));
-    }
-
-    public void hsetnx(final String key, final String field, final String value) {
-        hsetnx(SafeEncoder.encode(key), SafeEncoder.encode(field), SafeEncoder
-                .encode(value));
-    }
-
-    public void hmset(final String key, final Map<String, String> hash) {
-        final Map<byte[], byte[]> bhash = new HashMap<byte[], byte[]>(hash
-                .size());
-        for (final Entry<String, String> entry : hash.entrySet()) {
-            bhash.put(SafeEncoder.encode(entry.getKey()), SafeEncoder
-                    .encode(entry.getValue()));
-        }
-        hmset(SafeEncoder.encode(key), bhash);
-    }
-
-    public void hmget(final String key, final String... fields) {
-        final byte[][] bfields = new byte[fields.length][];
-        for (int i = 0; i < bfields.length; i++) {
-            bfields[i] = SafeEncoder.encode(fields[i]);
-        }
-        hmget(SafeEncoder.encode(key), bfields);
-    }
-
-    public void hincrBy(final String key, final String field, final int value) {
-        hincrBy(SafeEncoder.encode(key), SafeEncoder.encode(field), value);
-    }
-
-    public void hexists(final String key, final String field) {
-        hexists(SafeEncoder.encode(key), SafeEncoder.encode(field));
-    }
-
-    public void hdel(final String key, final String field) {
-        hdel(SafeEncoder.encode(key), SafeEncoder.encode(field));
-    }
-
-    public void hlen(final String key) {
-        hlen(SafeEncoder.encode(key));
-    }
-
-    public void hkeys(final String key) {
-        hkeys(SafeEncoder.encode(key));
-    }
-
-    public void hvals(final String key) {
-        hvals(SafeEncoder.encode(key));
-    }
-
-    public void hgetAll(final String key) {
-        hgetAll(SafeEncoder.encode(key));
     }
 
     public void rpush(final String key, final String string) {
@@ -330,14 +254,6 @@ public class Client extends BinaryClient {
         zincrby(SafeEncoder.encode(key), score, SafeEncoder.encode(member));
     }
 
-    public void zrank(final String key, final String member) {
-        zrank(SafeEncoder.encode(key), SafeEncoder.encode(member));
-    }
-
-    public void zrevrank(final String key, final String member) {
-        zrevrank(SafeEncoder.encode(key), SafeEncoder.encode(member));
-    }
-
     public void zrevrange(final String key, final int start, final int end) {
         zrevrange(SafeEncoder.encode(key), start, end);
     }
@@ -376,14 +292,6 @@ public class Client extends BinaryClient {
         sort(SafeEncoder.encode(key), sortingParameters);
     }
 
-    public void blpop(final String[] args) {
-        final byte[][] bargs = new byte[args.length][];
-        for (int i = 0; i < bargs.length; i++) {
-            bargs[i] = SafeEncoder.encode(args[i]);
-        }
-        blpop(bargs);
-    }
-
     public void sort(final String key, final SortingParams sortingParameters,
             final String dstkey) {
         sort(SafeEncoder.encode(key), sortingParameters, SafeEncoder
@@ -392,14 +300,6 @@ public class Client extends BinaryClient {
 
     public void sort(final String key, final String dstkey) {
         sort(SafeEncoder.encode(key), SafeEncoder.encode(dstkey));
-    }
-
-    public void brpop(final String[] args) {
-        final byte[][] bargs = new byte[args.length][];
-        for (int i = 0; i < bargs.length; i++) {
-            bargs[i] = SafeEncoder.encode(args[i]);
-        }
-        brpop(bargs);
     }
 
     public void zcount(final String key, final double min, final double max) {
@@ -433,72 +333,12 @@ public class Client extends BinaryClient {
                 count);
     }
 
-    public void zremrangeByRank(final String key, final int start, final int end) {
-        zremrangeByRank(SafeEncoder.encode(key), start, end);
-    }
-
     public void zremrangeByScore(final String key, final double start,
             final double end) {
         zremrangeByScore(SafeEncoder.encode(key), start, end);
     }
 
-    public void zunionstore(final String dstkey, final String... sets) {
-        final byte[][] bsets = new byte[sets.length][];
-        for (int i = 0; i < bsets.length; i++) {
-            bsets[i] = SafeEncoder.encode(sets[i]);
-        }
-        zunionstore(SafeEncoder.encode(dstkey), bsets);
-    }
-
-    public void zunionstore(final String dstkey, final ZParams params,
-            final String... sets) {
-        final byte[][] bsets = new byte[sets.length][];
-        for (int i = 0; i < bsets.length; i++) {
-            bsets[i] = SafeEncoder.encode(sets[i]);
-        }
-        zunionstore(SafeEncoder.encode(dstkey), params, bsets);
-    }
-
-    public void zinterstore(final String dstkey, final String... sets) {
-        final byte[][] bsets = new byte[sets.length][];
-        for (int i = 0; i < bsets.length; i++) {
-            bsets[i] = SafeEncoder.encode(sets[i]);
-        }
-        zinterstore(SafeEncoder.encode(dstkey), bsets);
-    }
-
-    public void zinterstore(final String dstkey, final ZParams params,
-            final String... sets) {
-        final byte[][] bsets = new byte[sets.length][];
-        for (int i = 0; i < bsets.length; i++) {
-            bsets[i] = SafeEncoder.encode(sets[i]);
-        }
-        zinterstore(SafeEncoder.encode(dstkey), params, bsets);
-    }
-
-    public void strlen(final String key) {
-        strlen(SafeEncoder.encode(key));
-    }
-
-    public void lpushx(final String key, final String string) {
-        lpushx(SafeEncoder.encode(key), SafeEncoder.encode(string));
-    }
-
-    public void persist(final String key) {
-        persist(SafeEncoder.encode(key));
-    }
-
-    public void rpushx(final String key, final String string) {
-        rpushx(SafeEncoder.encode(key), SafeEncoder.encode(string));
-    }
-
     public void echo(final String string) {
         echo(SafeEncoder.encode(string));
-    }
-
-    public void linsert(final String key, final LIST_POSITION where,
-            final String pivot, final String value) {
-        linsert(SafeEncoder.encode(key), where, SafeEncoder.encode(pivot),
-                SafeEncoder.encode(value));
     }
 }

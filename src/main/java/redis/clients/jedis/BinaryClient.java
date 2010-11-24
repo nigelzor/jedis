@@ -10,10 +10,7 @@ import static redis.clients.jedis.Protocol.Keyword.WITHSCORES;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import redis.clients.jedis.Protocol.Command;
-import redis.clients.jedis.Protocol.Keyword;
 import redis.clients.util.SafeEncoder;
 
 public class BinaryClient extends Connection {
@@ -128,10 +125,6 @@ public class BinaryClient extends Connection {
         sendCommand(SETNX, key, value);
     }
 
-    public void setex(final byte[] key, final int seconds, final byte[] value) {
-        sendCommand(SETEX, key, toByteArray(seconds), value);
-    }
-
     public void mset(final byte[]... keysvalues) {
         sendCommand(MSET, keysvalues);
     }
@@ -154,72 +147,6 @@ public class BinaryClient extends Connection {
 
     public void incr(final byte[] key) {
         sendCommand(INCR, key);
-    }
-
-    public void append(final byte[] key, final byte[] value) {
-        sendCommand(APPEND, key, value);
-    }
-
-    public void substr(final byte[] key, final int start, final int end) {
-        sendCommand(SUBSTR, key, toByteArray(start), toByteArray(end));
-    }
-
-    public void hset(final byte[] key, final byte[] field, final byte[] value) {
-        sendCommand(HSET, key, field, value);
-    }
-
-    public void hget(final byte[] key, final byte[] field) {
-        sendCommand(HGET, key, field);
-    }
-
-    public void hsetnx(final byte[] key, final byte[] field, final byte[] value) {
-        sendCommand(HSETNX, key, field, value);
-    }
-
-    public void hmset(final byte[] key, final Map<byte[], byte[]> hash) {
-        final List<byte[]> params = new ArrayList<byte[]>();
-        params.add(key);
-
-        for (final byte[] field : hash.keySet()) {
-            params.add(field);
-            params.add(hash.get(field));
-        }
-        sendCommand(HMSET, params.toArray(new byte[params.size()][]));
-    }
-
-    public void hmget(final byte[] key, final byte[]... fields) {
-        final byte[][] params = new byte[fields.length + 1][];
-        params[0] = key;
-        System.arraycopy(fields, 0, params, 1, fields.length);
-        sendCommand(HMGET, params);
-    }
-
-    public void hincrBy(final byte[] key, final byte[] field, final int value) {
-        sendCommand(HINCRBY, key, field, toByteArray(value));
-    }
-
-    public void hexists(final byte[] key, final byte[] field) {
-        sendCommand(HEXISTS, key, field);
-    }
-
-    public void hdel(final byte[] key, final byte[] field) {
-        sendCommand(HDEL, key, field);
-    }
-
-    public void hlen(final byte[] key) {
-        sendCommand(HLEN, key);
-    }
-
-    public void hkeys(final byte[] key) {
-        sendCommand(HKEYS, key);
-    }
-
-    public void hvals(final byte[] key) {
-        sendCommand(HVALS, key);
-    }
-
-    public void hgetAll(final byte[] key) {
-        sendCommand(HGETALL, key);
     }
 
     public void rpush(final byte[] key, final byte[] string) {
@@ -349,14 +276,6 @@ public class BinaryClient extends Connection {
         sendCommand(ZINCRBY, key, toByteArray(score), member);
     }
 
-    public void zrank(final byte[] key, final byte[] member) {
-        sendCommand(ZRANK, key, member);
-    }
-
-    public void zrevrank(final byte[] key, final byte[] member) {
-        sendCommand(ZREVRANK, key, member);
-    }
-
     public void zrevrange(final byte[] key, final int start, final int end) {
         sendCommand(ZREVRANGE, key, toByteArray(start), toByteArray(end));
     }
@@ -381,21 +300,6 @@ public class BinaryClient extends Connection {
         sendCommand(ZSCORE, key, member);
     }
 
-    public void multi() {
-        sendCommand(MULTI);
-        isInMulti = true;
-    }
-
-    public void discard() {
-        sendCommand(DISCARD);
-        isInMulti = false;
-    }
-
-    public void exec() {
-        sendCommand(EXEC);
-        isInMulti = false;
-    }
-
     public void watch(final byte[]... keys) {
         sendCommand(WATCH, keys);
     }
@@ -415,10 +319,6 @@ public class BinaryClient extends Connection {
         sendCommand(SORT, args.toArray(new byte[args.size()][]));
     }
 
-    public void blpop(final byte[][] args) {
-        sendCommand(BLPOP, args);
-    }
-
     public void sort(final byte[] key, final SortingParams sortingParameters,
             final byte[] dstkey) {
         final List<byte[]> args = new ArrayList<byte[]>();
@@ -433,40 +333,8 @@ public class BinaryClient extends Connection {
         sendCommand(SORT, key, STORE.raw, dstkey);
     }
 
-    public void brpop(final byte[][] args) {
-        sendCommand(BRPOP, args);
-    }
-
     public void auth(final String password) {
         sendCommand(AUTH, password);
-    }
-
-    public void subscribe(final String... channels) {
-        sendCommand(SUBSCRIBE, channels);
-    }
-
-    public void publish(final String channel, final String message) {
-        sendCommand(PUBLISH, channel, message);
-    }
-
-    public void unsubscribe() {
-        sendCommand(UNSUBSCRIBE);
-    }
-
-    public void unsubscribe(final String... channels) {
-        sendCommand(UNSUBSCRIBE, channels);
-    }
-
-    public void psubscribe(final String[] patterns) {
-        sendCommand(PSUBSCRIBE, patterns);
-    }
-
-    public void punsubscribe() {
-        sendCommand(PUNSUBSCRIBE);
-    }
-
-    public void punsubscribe(final String... patterns) {
-        sendCommand(PUNSUBSCRIBE, patterns);
     }
 
     public void zcount(final byte[] key, final double min, final double max) {
@@ -502,53 +370,9 @@ public class BinaryClient extends Connection {
                 WITHSCORES.raw);
     }
 
-    public void zremrangeByRank(final byte[] key, final int start, final int end) {
-        sendCommand(ZREMRANGEBYRANK, key, toByteArray(start), toByteArray(end));
-    }
-
     public void zremrangeByScore(final byte[] key, final double start,
             final double end) {
         sendCommand(ZREMRANGEBYSCORE, key, toByteArray(start), toByteArray(end));
-    }
-
-    public void zunionstore(final byte[] dstkey, final byte[]... sets) {
-        final byte[][] params = new byte[sets.length + 2][];
-        params[0] = dstkey;
-        params[1] = toByteArray(sets.length);
-        System.arraycopy(sets, 0, params, 2, sets.length);
-        sendCommand(ZUNIONSTORE, params);
-    }
-
-    public void zunionstore(final byte[] dstkey, final ZParams params,
-            final byte[]... sets) {
-        final List<byte[]> args = new ArrayList<byte[]>();
-        args.add(dstkey);
-        args.add(Protocol.toByteArray(sets.length));
-        for (final byte[] set : sets) {
-            args.add(set);
-        }
-        args.addAll(params.getParams());
-        sendCommand(ZUNIONSTORE, args.toArray(new byte[args.size()][]));
-    }
-
-    public void zinterstore(final byte[] dstkey, final byte[]... sets) {
-        final byte[][] params = new byte[sets.length + 2][];
-        params[0] = dstkey;
-        params[1] = Protocol.toByteArray(sets.length);
-        System.arraycopy(sets, 0, params, 2, sets.length);
-        sendCommand(ZINTERSTORE, params);
-    }
-
-    public void zinterstore(final byte[] dstkey, final ZParams params,
-            final byte[]... sets) {
-        final List<byte[]> args = new ArrayList<byte[]>();
-        args.add(dstkey);
-        args.add(Protocol.toByteArray(sets.length));
-        for (final byte[] set : sets) {
-            args.add(set);
-        }
-        args.addAll(params.getParams());
-        sendCommand(ZINTERSTORE, args.toArray(new byte[args.size()][]));
     }
 
     public void save() {
@@ -587,44 +411,11 @@ public class BinaryClient extends Connection {
         sendCommand(SLAVEOF, NO.raw, ONE.raw);
     }
 
-    public void configGet(final String pattern) {
-        sendCommand(CONFIG, Keyword.GET.name(), pattern);
-    }
-
-    public void configSet(final String parameter, final String value) {
-        sendCommand(CONFIG, Keyword.SET.name(), parameter, value);
-    }
-
-    public void strlen(final byte[] key) {
-        sendCommand(STRLEN, key);
-    }
-
     public void sync() {
         sendCommand(SYNC);
     }
 
-    public void lpushx(final byte[] key, final byte[] string) {
-        sendCommand(LPUSHX, key, string);
-    }
-
-    public void persist(final byte[] key) {
-        sendCommand(PERSIST, key);
-    }
-
-    public void rpushx(final byte[] key, final byte[] string) {
-        sendCommand(RPUSHX, key, string);
-    }
-
     public void echo(final byte[] string) {
         sendCommand(ECHO, string);
-    }
-
-    public void linsert(final byte[] key, final LIST_POSITION where,
-            final byte[] pivot, final byte[] value) {
-        sendCommand(LINSERT, key, where.raw, pivot, value);
-    }
-
-    public void debug(final DebugParams params) {
-        sendCommand(DEBUG, params.getCommand());
     }
 }
