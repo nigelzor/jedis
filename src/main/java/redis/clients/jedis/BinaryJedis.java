@@ -31,6 +31,20 @@ public class BinaryJedis implements BinaryJedisCommands {
         client.setTimeout(shardInfo.getTimeout());
         this.password = shardInfo.getPassword();
     }
+    
+    private static <T> Set<T> setOrNull(List<T> elements) {
+    	if (elements == null) {
+    		return null;
+    	}
+    	return new LinkedHashSet<T>(elements);
+    }
+    
+    private static Double doubleOrNull(String value) {
+    	if (value == null) {
+    		return null;
+    	}
+    	return Double.valueOf(value);
+    }
 
     public String ping() {
         checkIsInMulti();
@@ -178,6 +192,9 @@ public class BinaryJedis implements BinaryJedisCommands {
         client.keys(pattern);
         // NOTE: this hack is unsafe for non-ascii keys
         String reply = client.getBulkReply();
+        if (reply == null) {
+        	return null;
+        }
         final Set<byte[]> keySet = new LinkedHashSet<byte[]>();
 		for (String key : reply.split(" ")) {
 			if (key.length() > 0) {
@@ -904,8 +921,7 @@ public class BinaryJedis implements BinaryJedisCommands {
     public Set<byte[]> smembers(final byte[] key) {
         checkIsInMulti();
         client.smembers(key);
-        final List<byte[]> members = client.getBinaryMultiBulkReply();
-        return new LinkedHashSet<byte[]>(members);
+        return setOrNull(client.getBinaryMultiBulkReply());
     }
 
     /**
@@ -1028,8 +1044,7 @@ public class BinaryJedis implements BinaryJedisCommands {
     public Set<byte[]> sinter(final byte[]... keys) {
         checkIsInMulti();
         client.sinter(keys);
-        final List<byte[]> members = client.getBinaryMultiBulkReply();
-        return new LinkedHashSet<byte[]>(members);
+        return setOrNull(client.getBinaryMultiBulkReply());
     }
 
     /**
@@ -1068,8 +1083,7 @@ public class BinaryJedis implements BinaryJedisCommands {
     public Set<byte[]> sunion(final byte[]... keys) {
         checkIsInMulti();
         client.sunion(keys);
-        final List<byte[]> members = client.getBinaryMultiBulkReply();
-        return new LinkedHashSet<byte[]>(members);
+        return setOrNull(client.getBinaryMultiBulkReply());
     }
 
     /**
@@ -1116,8 +1130,7 @@ public class BinaryJedis implements BinaryJedisCommands {
     public Set<byte[]> sdiff(final byte[]... keys) {
         checkIsInMulti();
         client.sdiff(keys);
-        final List<byte[]> members = client.getBinaryMultiBulkReply();
-        return new LinkedHashSet<byte[]>(members);
+        return setOrNull(client.getBinaryMultiBulkReply());
     }
 
     /**
@@ -1183,8 +1196,7 @@ public class BinaryJedis implements BinaryJedisCommands {
     public Set<byte[]> zrange(final byte[] key, final int start, final int end) {
         checkIsInMulti();
         client.zrange(key, start, end);
-        final List<byte[]> members = client.getBinaryMultiBulkReply();
-        return new LinkedHashSet<byte[]>(members);
+        return setOrNull(client.getBinaryMultiBulkReply());
     }
 
     /**
@@ -1236,32 +1248,28 @@ public class BinaryJedis implements BinaryJedisCommands {
             final byte[] member) {
         checkIsInMulti();
         client.zincrby(key, score, member);
-        String newscore = client.getBulkReply();
-        return Double.valueOf(newscore);
+        return doubleOrNull(client.getBulkReply());
     }
 
     public Set<byte[]> zrevrange(final byte[] key, final int start,
             final int end) {
         checkIsInMulti();
         client.zrevrange(key, start, end);
-        final List<byte[]> members = client.getBinaryMultiBulkReply();
-        return new LinkedHashSet<byte[]>(members);
+        return setOrNull(client.getBinaryMultiBulkReply());
     }
 
     public Set<Tuple> zrangeWithScores(final byte[] key, final int start,
             final int end) {
         checkIsInMulti();
         client.zrangeWithScores(key, start, end);
-        Set<Tuple> set = getBinaryTupledSet();
-        return set;
+        return getBinaryTupledSet();
     }
 
     public Set<Tuple> zrevrangeWithScores(final byte[] key, final int start,
             final int end) {
         checkIsInMulti();
         client.zrevrangeWithScores(key, start, end);
-        Set<Tuple> set = getBinaryTupledSet();
-        return set;
+        return getBinaryTupledSet();
     }
 
     /**
@@ -1293,8 +1301,7 @@ public class BinaryJedis implements BinaryJedisCommands {
     public Double zscore(final byte[] key, final byte[] member) {
         checkIsInMulti();
         client.zscore(key, member);
-        final String score = client.getBulkReply();
-        return (score != null ? new Double(score) : null);
+        return doubleOrNull(client.getBulkReply());
     }
 
     protected void checkIsInMulti() {
@@ -1564,14 +1571,14 @@ public class BinaryJedis implements BinaryJedisCommands {
             final double max) {
         checkIsInMulti();
         client.zrangeByScore(key, min, max);
-        return new LinkedHashSet<byte[]>(client.getBinaryMultiBulkReply());
+        return setOrNull(client.getBinaryMultiBulkReply());
     }
 
     public Set<byte[]> zrangeByScore(final byte[] key, final byte[] min,
             final byte[] max) {
         checkIsInMulti();
         client.zrangeByScore(key, min, max);
-        return new LinkedHashSet<byte[]>(client.getBinaryMultiBulkReply());
+        return setOrNull(client.getBinaryMultiBulkReply());
     }
 
     /**
@@ -1634,7 +1641,7 @@ public class BinaryJedis implements BinaryJedisCommands {
             final double max, final int offset, final int count) {
         checkIsInMulti();
         client.zrangeByScore(key, min, max, offset, count);
-        return new LinkedHashSet<byte[]>(client.getBinaryMultiBulkReply());
+        return setOrNull(client.getBinaryMultiBulkReply());
     }
 
     /**
@@ -1697,8 +1704,7 @@ public class BinaryJedis implements BinaryJedisCommands {
             final double min, final double max) {
         checkIsInMulti();
         client.zrangeByScoreWithScores(key, min, max);
-        Set<Tuple> set = getBinaryTupledSet();
-        return set;
+        return getBinaryTupledSet();
     }
 
     /**
@@ -1762,13 +1768,15 @@ public class BinaryJedis implements BinaryJedisCommands {
             final int count) {
         checkIsInMulti();
         client.zrangeByScoreWithScores(key, min, max, offset, count);
-        Set<Tuple> set = getBinaryTupledSet();
-        return set;
+        return getBinaryTupledSet();
     }
 
     private Set<Tuple> getBinaryTupledSet() {
         checkIsInMulti();
         List<byte[]> membersWithScores = client.getBinaryMultiBulkReply();
+        if (membersWithScores == null) {
+        	return null;
+        }
         Set<Tuple> set = new LinkedHashSet<Tuple>();
         Iterator<byte[]> iterator = membersWithScores.iterator();
         while (iterator.hasNext()) {
